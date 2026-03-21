@@ -51,7 +51,7 @@ def obtener_tareas_hoy():
         next_cursor = data.get('next_cursor')
         if not next_cursor:
             break
-        params = {"cursor": next_cursor}
+        params = {"query": FILTER, "lang": "es", "cursor": next_cursor}
 
     grupos = defaultdict(list)
     fechas_orden = []
