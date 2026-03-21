@@ -74,11 +74,10 @@ def generar_html(grupos: dict, fechas_orden: list, subtareas_por_padre: dict = N
     if subtareas_por_padre is None:
         subtareas_por_padre = {}
 
-    partes = []
+    bloques = []
     for fecha_str in fechas_orden:
         encabezado = fecha_a_encabezado(fecha_str) if fecha_str else "Sin fecha"
-        partes.append(f'<h2>{_escapar_html(encabezado)}</h2>')
-        partes.append('<ul>')
+        partes = [f'<h2>{_escapar_html(encabezado)}</h2>', '<ul>']
         tareas_padre = [t for t in grupos[fecha_str] if not t.get('parent_id')]
         for tarea in sorted(tareas_padre, key=lambda t: t.get('priority', 1), reverse=True):
             prioridad = tarea.get('priority', 1)
@@ -103,4 +102,5 @@ def generar_html(grupos: dict, fechas_orden: list, subtareas_por_padre: dict = N
 
             partes.append(f'<li>{titulo_html}{extra}</li>')
         partes.append('</ul>')
-    return "\n".join(partes)
+        bloques.append(f'<div class="bloque-dia">\n' + "\n".join(partes) + '\n</div>')
+    return '<div class="columnas">\n' + "\n".join(bloques) + '\n</div>'

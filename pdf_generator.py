@@ -10,6 +10,14 @@ body {
     margin: 0.5cm;
     color: #222;
 }
+.columnas {
+    column-count: 2;
+    column-gap: 0.6cm;
+}
+.bloque-dia {
+    break-inside: avoid-column;
+    display: block;
+}
 h2 {
     color: #2c3e50;
     border-bottom: 1px solid #ccc;
