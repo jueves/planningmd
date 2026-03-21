@@ -42,7 +42,7 @@ def generar_markdown(grupos: dict, fechas_orden: list) -> str:
     for fecha_str in fechas_orden:
         encabezado = fecha_a_encabezado(fecha_str) if fecha_str else "Sin fecha"
         lineas.append(f"## {encabezado}")
-        for tarea in grupos[fecha_str]:
+        for tarea in sorted(grupos[fecha_str], key=lambda t: t.get('priority', 1), reverse=True):
             prioridad = tarea.get('priority', 1)
             emoji = EMOJIS_PRIORIDAD.get(prioridad, '')
             contenido = tarea.get('content', '')

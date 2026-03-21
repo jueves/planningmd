@@ -41,4 +41,6 @@ def obtener_tareas() -> dict[str, list]:
             fechas_orden.append(fecha_str)
         grupos[fecha_str].append(tarea)
 
+    fechas_orden.sort(key=lambda f: f if f else "9999-99-99")
+
     return grupos, fechas_orden
