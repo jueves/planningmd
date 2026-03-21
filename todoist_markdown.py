@@ -1,7 +1,7 @@
 import requests
 from dotenv import load_dotenv
 import os
-from datetime import date, datetime
+from datetime import datetime
 from collections import defaultdict
 
 load_dotenv()
@@ -32,16 +32,8 @@ def fecha_a_encabezado(fecha_str):
         fecha = datetime.fromisoformat(fecha_str).date()
     except (ValueError, TypeError):
         return "Sin fecha"
-    hoy = date.today()
-    diferencia = (fecha - hoy).days
-    if diferencia == 0:
-        return "Hoy"
-    elif diferencia == 1:
-        return "Mañana"
-    elif diferencia == -1:
-        return "Ayer"
-    else:
-        return DIAS_SEMANA.get(fecha.weekday(), str(fecha))
+    dia = DIAS_SEMANA.get(fecha.weekday(), str(fecha)).upper()
+    return f"{dia} {fecha.strftime('%d/%m/%Y')}"
 
 def obtener_tareas_hoy():
     """Descarga las tareas que corresponden al filtro especificado."""
