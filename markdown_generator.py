@@ -28,12 +28,13 @@ def fecha_a_encabezado(fecha_str: str) -> str:
     return f"{dia} {fecha.strftime('%d/%m/%Y')}"
 
 
-def generar_markdown(grupos: dict, fechas_orden: list) -> str:
+def generar_markdown(grupos: dict, fechas_orden: list, modo_detalles: bool = False) -> str:
     """Genera el texto markdown a partir de los grupos de tareas.
 
     Args:
         grupos: dict {fecha_str: [tareas]}
         fechas_orden: lista de fechas en orden de aparición
+        modo_detalles: si True, muestra nombre en negrita, etiquetas y descripción
 
     Returns:
         String con el markdown generado.
@@ -46,5 +47,15 @@ def generar_markdown(grupos: dict, fechas_orden: list) -> str:
             prioridad = tarea.get('priority', 1)
             emoji = EMOJIS_PRIORIDAD.get(prioridad, '')
             contenido = tarea.get('content', '')
-            lineas.append(f"- [ ] {emoji} {contenido}".rstrip())
+            if modo_detalles:
+                etiquetas = tarea.get('labels', [])
+                descripcion = tarea.get('description', '') or ''
+                partes = [f"**{contenido}**"]
+                if etiquetas:
+                    partes.append(" ".join(f"`{e}`" for e in etiquetas))
+                if descripcion:
+                    partes.append(descripcion[:100])
+                lineas.append(f"- [ ] {emoji} {'  '.join(partes)}".rstrip())
+            else:
+                lineas.append(f"- [ ] {emoji} {contenido}".rstrip())
     return "\n".join(lineas)
