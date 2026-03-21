@@ -16,7 +16,6 @@ TODOIST_API_TOKEN=your_token_here   # Todoist API token (Settings > Integrations
 
 # Optional
 TODOIST_FILTER=today                # Todoist filter query to select tasks (default: "today")
-SUBTASK_DAYS=7                      # Max days ahead to include subtasks (default: 7)
 ```
 
 ## Usage
