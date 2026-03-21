@@ -1,24 +1,63 @@
-# Trabajar directamente con todoist_client.py
-Desde la carpeta del proyecto, abrir Python y ejecutar:
+# planningmd
+
+Generates a daily planning PDF from Todoist tasks, grouped by date.
+
+## Requirements
+
+```bash
+pip install -r requirements.txt
+```
+
+Create a `.env` file in the project root:
+
+```
+# Required
+TODOIST_API_TOKEN=your_token_here   # Todoist API token (Settings > Integrations > Developer)
+
+# Optional
+TODOIST_FILTER=today                # Todoist filter query to select tasks (default: "today")
+SUBTASK_DAYS=7                      # Max days ahead to include subtasks (default: 7)
+```
+
+## Usage
+
+```bash
+python main.py
+```
+
+Generates a PDF in the current directory and prints the markdown to the console.
+
+## Structure
+
+| File | Description |
+|---|---|
+| `main.py` | Main entry point |
+| `todoist_client.py` | Fetches tasks from the Todoist API |
+| `markdown_generator.py` | Generates Markdown content |
+| `html_generator.py` | Converts to styled HTML |
+| `pdf_generator.py` | Exports HTML to PDF (WeasyPrint) |
+| `styles.css` | PDF styles |
+
+## Working directly with todoist_client.py
+
+From the project folder, open Python and run:
 
 ```python
 from todoist_client import obtener_tareas
 
 grupos, fechas_orden = obtener_tareas()
 
-Luego puedes inspeccionar la salida:
-
-# Ver las fechas en orden
+# See dates in order
 fechas_orden
 
-# Ver todas las tareas de una fecha
+# See all tasks for a date
 grupos['2026-03-21']
 
-# Ver solo los contenidos de una fecha
+# See only the contents for a date
 [t['content'] for t in grupos['2026-03-21']]
 
-# Ver las claves disponibles en una tarea
+# See available keys in a task
 grupos['2026-03-21'][0].keys()
 ```
 
-Si el .env está en la misma carpeta, `load_dotenv()` lo carga automáticamente al importar el módulo, así que no necesitas configurar nada más.
+If the `.env` file is in the same folder, `load_dotenv()` loads it automatically when importing the module, so no further configuration is needed.
