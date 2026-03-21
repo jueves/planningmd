@@ -21,6 +21,9 @@ DIAS_SEMANA = {
 
 def limpiar_markdown(texto: str) -> str:
     """Elimina el formato markdown de un texto usando expresiones regulares."""
+    # Descripción cuyo único contenido es un enlace con título "Nota"
+    if re.fullmatch(r'\[Nota\]\(.+?\)', texto.strip()):
+        return ''
     # Negrita y cursiva: ***text*** o **text** o *text* o ___text___ o __text__ o _text_
     texto = re.sub(r'\*{1,3}(.+?)\*{1,3}', r'\1', texto)
     texto = re.sub(r'_{1,3}(.+?)_{1,3}', r'\1', texto)
