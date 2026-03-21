@@ -1,13 +1,15 @@
 from todoist_client import obtener_tareas
 from markdown_generator import generar_markdown
-from pdf_generator import generar_pdf
+from html_generator import generar_html
+from pdf_generator import generar_pdf, generar_pdf_desde_html
 
 
 def main():
-    grupos, fechas_orden = obtener_tareas()
+    grupos, fechas_orden, subtareas_por_padre = obtener_tareas()
     contenido = generar_markdown(grupos, fechas_orden)
     print(contenido)
-    ruta = generar_pdf(contenido)
+    html = generar_html(grupos, fechas_orden, subtareas_por_padre)
+    ruta = generar_pdf_desde_html(html)
     print(f"\nPDF generado: {ruta}")
 
 
