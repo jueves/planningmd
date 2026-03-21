@@ -31,6 +31,16 @@ li {
     color: #555;
     margin-left: 1.2em;
 }
+ul.subtareas {
+    list-style: disc;
+    font-size: 7pt;
+    color: #555;
+    margin: 1px 0 0 1.2em;
+    padding-left: 1em;
+}
+ul.subtareas li {
+    padding: 0;
+}
 """
 
 

@@ -61,7 +61,7 @@ def _escapar_html(texto: str) -> str:
 
 
 def generar_html(grupos: dict, fechas_orden: list) -> str:
-    """Genera HTML con título de tarea en negrita y descripción resumida debajo.
+    """Genera HTML con título de tarea, descripción resumida y subtareas debajo.
 
     Args:
         grupos: dict {fecha_str: [tareas]}
@@ -70,12 +70,21 @@ def generar_html(grupos: dict, fechas_orden: list) -> str:
     Returns:
         String con el HTML generado (sin DOCTYPE/html wrapper).
     """
+    # Índice global de subtareas por parent_id (a partir de todas las fechas)
+    subtareas_por_padre = {}
+    for tareas in grupos.values():
+        for tarea in tareas:
+            pid = tarea.get('parent_id')
+            if pid:
+                subtareas_por_padre.setdefault(pid, []).append(tarea)
+
     partes = []
     for fecha_str in fechas_orden:
         encabezado = fecha_a_encabezado(fecha_str) if fecha_str else "Sin fecha"
         partes.append(f'<h2>{_escapar_html(encabezado)}</h2>')
         partes.append('<ul>')
-        for tarea in sorted(grupos[fecha_str], key=lambda t: t.get('priority', 1), reverse=True):
+        tareas_padre = [t for t in grupos[fecha_str] if not t.get('parent_id')]
+        for tarea in sorted(tareas_padre, key=lambda t: t.get('priority', 1), reverse=True):
             prioridad = tarea.get('priority', 1)
             emoji = EMOJIS_PRIORIDAD.get(prioridad, '')
             contenido = _escapar_html(tarea.get('content', ''))
@@ -84,12 +93,18 @@ def generar_html(grupos: dict, fechas_orden: list) -> str:
             descripcion_limpia = _escapar_html(descripcion_limpia)
 
             titulo_html = f'{emoji} {contenido}'.strip()
+            extra = ''
             if descripcion_limpia:
-                partes.append(
-                    f'<li>{titulo_html}'
-                    f'<br><span class="desc">{descripcion_limpia}</span></li>'
+                extra += f'<br><span class="desc">{descripcion_limpia}</span>'
+
+            subtareas = subtareas_por_padre.get(tarea.get('id'), [])
+            if subtareas:
+                items = ''.join(
+                    f'<li>{_escapar_html(s.get("content", ""))}</li>'
+                    for s in subtareas
                 )
-            else:
-                partes.append(f'<li>{titulo_html}</li>')
+                extra += f'<ul class="subtareas">{items}</ul>'
+
+            partes.append(f'<li>{titulo_html}{extra}</li>')
         partes.append('</ul>')
     return "\n".join(partes)
