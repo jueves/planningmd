@@ -24,7 +24,7 @@ def obtener_tareas_hoy():
     response = requests.get(url, headers=headers, params=params)
     response.raise_for_status()
     
-    tareas = response.json()
+    tareas = response.json().get('items', [])
     
     for tarea in tareas:
         # Usar .get() con valor por defecto para evitar el error
