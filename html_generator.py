@@ -8,17 +8,6 @@ PRIORITY_EMOJIS = {
     1: ""       # p4 - Normal
 }
 
-WEEKDAYS = {
-    0: "Monday",
-    1: "Tuesday",
-    2: "Wednesday",
-    3: "Thursday",
-    4: "Friday",
-    5: "Saturday",
-    6: "Sunday",
-}
-
-
 def clean_markdown(text: str) -> str:
     """Removes markdown formatting from text using regular expressions."""
     # Description whose only content is a link with title "Note"
@@ -48,7 +37,7 @@ def date_to_heading(date_str: str) -> str:
         date = datetime.fromisoformat(date_str).date()
     except (ValueError, TypeError):
         return "No date"
-    day = WEEKDAYS.get(date.weekday(), str(date)).upper()
+    day = date.strftime('%A').upper()
     return f"{day} {date.strftime('%d/%m/%Y')}"
 
 
