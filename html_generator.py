@@ -60,23 +60,19 @@ def _escapar_html(texto: str) -> str:
             .replace('>', '&gt;'))
 
 
-def generar_html(grupos: dict, fechas_orden: list) -> str:
+def generar_html(grupos: dict, fechas_orden: list, subtareas_por_padre: dict = None) -> str:
     """Genera HTML con título de tarea, descripción resumida y subtareas debajo.
 
     Args:
         grupos: dict {fecha_str: [tareas]}
         fechas_orden: lista de fechas en orden de aparición
+        subtareas_por_padre: dict {parent_id: [subtareas]} con TODAS las subtareas
 
     Returns:
         String con el HTML generado (sin DOCTYPE/html wrapper).
     """
-    # Índice global de subtareas por parent_id (a partir de todas las fechas)
-    subtareas_por_padre = {}
-    for tareas in grupos.values():
-        for tarea in tareas:
-            pid = tarea.get('parent_id')
-            if pid:
-                subtareas_por_padre.setdefault(pid, []).append(tarea)
+    if subtareas_por_padre is None:
+        subtareas_por_padre = {}
 
     partes = []
     for fecha_str in fechas_orden:

@@ -37,12 +37,14 @@ def obtener_tareas() -> dict[str, list]:
 
     grupos = defaultdict(list)
     fechas_orden = []
+    subtareas_por_padre = defaultdict(list)
 
     for tarea in tareas:
         due = tarea.get('due') or {}
         fecha_str = due.get('date', '')
 
         if tarea.get('parent_id'):
+            subtareas_por_padre[tarea['parent_id']].append(tarea)
             if not fecha_str:
                 continue
             try:
@@ -57,4 +59,4 @@ def obtener_tareas() -> dict[str, list]:
 
     fechas_orden.sort(key=lambda f: f if f else "9999-99-99")
 
-    return grupos, fechas_orden
+    return grupos, fechas_orden, subtareas_por_padre
