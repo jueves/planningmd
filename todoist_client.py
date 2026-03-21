@@ -2,11 +2,13 @@ import requests
 from dotenv import load_dotenv
 import os
 from collections import defaultdict
+from datetime import date, timedelta
 
 load_dotenv()
 
 API_TOKEN = os.getenv("TODOIST_API_TOKEN")
 FILTER = os.getenv("TODOIST_FILTER", "today")
+SUBTASK_DAYS = int(os.getenv("SUBTASK_DAYS", "7"))
 
 
 def obtener_tareas() -> dict[str, list]:
@@ -31,14 +33,28 @@ def obtener_tareas() -> dict[str, list]:
             break
         params = {"query": FILTER, "lang": "es", "cursor": next_cursor}
 
+    fecha_limite = date.today() + timedelta(days=SUBTASK_DAYS)
+
     grupos = defaultdict(list)
     fechas_orden = []
 
     for tarea in tareas:
         due = tarea.get('due') or {}
         fecha_str = due.get('date', '')
+
+        if tarea.get('parent_id'):
+            if not fecha_str:
+                continue
+            try:
+                if date.fromisoformat(fecha_str) > fecha_limite:
+                    continue
+            except ValueError:
+                continue
+
         if fecha_str not in fechas_orden:
             fechas_orden.append(fecha_str)
         grupos[fecha_str].append(tarea)
+
+    fechas_orden.sort(key=lambda f: f if f else "9999-99-99")
 
     return grupos, fechas_orden
