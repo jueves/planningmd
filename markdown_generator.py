@@ -54,7 +54,7 @@ def generar_markdown(grupos: dict, fechas_orden: list, modo_detalles: bool = Fal
                 if etiquetas:
                     partes.append(" ".join(f"`{e}`" for e in etiquetas))
                 if descripcion:
-                    partes.append(descripcion[:100])
+                    partes.append(f"`{descripcion[:100]}`")
                 lineas.append(f"- [ ] {emoji} {'  '.join(partes)}".rstrip())
             else:
                 lineas.append(f"- [ ] {emoji} {contenido}".rstrip())
