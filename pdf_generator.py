@@ -5,8 +5,8 @@ from datetime import datetime
 _CSS_PATH = Path(__file__).parent / "styles.css"
 
 
-def _html_completo(contenido_html: str, dos_columnas: bool) -> str:
-    body = f'<div class="columnas">{contenido_html}</div>' if dos_columnas else contenido_html
+def _complete_html(html_content: str, two_columns: bool) -> str:
+    body = f'<div class="columnas">{html_content}</div>' if two_columns else html_content
     return f"""<!DOCTYPE html>
 <html>
 <head>
@@ -16,43 +16,43 @@ def _html_completo(contenido_html: str, dos_columnas: bool) -> str:
 </html>"""
 
 
-def generar_pdf_desde_html(contenido_html: str, ruta_salida: str = None, dos_columnas: bool = False) -> str:
-    """Genera un PDF a partir de contenido HTML.
+def generate_pdf(html_content: str, output_path: str = None, two_columns: bool = False) -> str:
+    """Generates a PDF from HTML content.
 
-    Si dos_columnas es False (por defecto), renderiza primero sin columnas y
-    comprueba el número de páginas. Si el resultado ocupa más de una página,
-    vuelve a renderizar automáticamente con dos columnas.
+    If two_columns is False (default), renders first without columns and
+    checks the number of pages. If the result takes more than one page,
+    automatically re-renders with two columns.
 
     Args:
-        contenido_html: Fragmento HTML del body a convertir.
-        ruta_salida: Ruta del archivo PDF de salida. Si no se indica,
-                     se genera un nombre con la fecha/hora actual.
-        dos_columnas: Si True, usa el layout de dos columnas directamente.
+        html_content: HTML fragment of the body to convert.
+        output_path: Path of the output PDF file. If not provided,
+                     a name is generated with the current date/time.
+        two_columns: If True, uses the two-column layout directly.
 
     Returns:
-        Ruta del archivo PDF generado.
+        Path of the generated PDF file.
     """
-    if ruta_salida is None:
+    if output_path is None:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        ruta_salida = f"planning_{timestamp}.pdf"
+        output_path = f"planning_{timestamp}.pdf"
 
-    estilos = [CSS(filename=str(_CSS_PATH))]
+    styles = [CSS(filename=str(_CSS_PATH))]
 
-    if dos_columnas:
-        HTML(string=_html_completo(contenido_html, dos_columnas=True)).write_pdf(
-            ruta_salida, stylesheets=estilos
+    if two_columns:
+        HTML(string=_complete_html(html_content, two_columns=True)).write_pdf(
+            output_path, stylesheets=styles
         )
-        return ruta_salida
+        return output_path
 
-    documento = HTML(string=_html_completo(contenido_html, dos_columnas=False)).render(
-        stylesheets=estilos
+    document = HTML(string=_complete_html(html_content, two_columns=False)).render(
+        stylesheets=styles
     )
-    if len(documento.pages) > 1:
-        print(f"PDF ocupa {len(documento.pages)} páginas, regenerando con dos columnas...")
-        HTML(string=_html_completo(contenido_html, dos_columnas=True)).write_pdf(
-            ruta_salida, stylesheets=estilos
+    if len(document.pages) > 1:
+        print(f"PDF has {len(document.pages)} pages, regenerating with two columns...")
+        HTML(string=_complete_html(html_content, two_columns=True)).write_pdf(
+            output_path, stylesheets=styles
         )
     else:
-        documento.write_pdf(ruta_salida)
+        document.write_pdf(output_path)
 
-    return ruta_salida
+    return output_path

@@ -11,80 +11,80 @@ FILTER = os.getenv("TODOIST_FILTER", "today")
 SUBTASK_DAYS = int(os.getenv("SUBTASK_DAYS", "7"))
 
 
-def _obtener_todas_las_tareas() -> list:
-    """Descarga todas las tareas activas de la cuenta sin ningún filtro."""
+def _get_all_tasks() -> list:
+    """Downloads all active tasks from the account without any filter."""
     url = "https://api.todoist.com/api/v1/tasks"
     headers = {"Authorization": f"Bearer {API_TOKEN}"}
     params = {}
 
-    tareas = []
+    tasks = []
     while True:
         response = requests.get(url, headers=headers, params=params)
         response.raise_for_status()
         data = response.json()
-        tareas.extend(data.get('results', []))
+        tasks.extend(data.get('results', []))
         next_cursor = data.get('next_cursor')
         if not next_cursor:
             break
         params = {"cursor": next_cursor}
 
-    return tareas
+    return tasks
 
 
-def obtener_tareas() -> dict[str, list]:
-    """Descarga las tareas que corresponden al filtro y las agrupa por fecha.
+def get_tasks() -> dict[str, list]:
+    """Downloads the tasks matching the filter and groups them by date.
 
     Returns:
-        Tupla (grupos, fechas_orden, subtareas_por_padre) donde grupos es un
-        dict {fecha_str: [tareas]}, fechas_orden es la lista de fechas en orden,
-        y subtareas_por_padre es un dict {parent_id: [subtareas]} con todas las
-        subtareas de la cuenta.
+        Tuple (groups, dates_order, subtasks_by_parent) where groups is a
+        dict {date_str: [tasks]}, dates_order is the list of dates in order,
+        and subtasks_by_parent is a dict {parent_id: [subtasks]} with all
+        subtasks in the account.
     """
     url = "https://api.todoist.com/api/v1/tasks/filter"
     headers = {"Authorization": f"Bearer {API_TOKEN}"}
-    params = {"query": FILTER, "lang": "es"}
+    params = {"query": FILTER}
 
-    tareas = []
+    tasks = []
     while True:
         response = requests.get(url, headers=headers, params=params)
         response.raise_for_status()
         data = response.json()
-        tareas.extend(data.get('results', []))
+        tasks.extend(data.get('results', []))
         next_cursor = data.get('next_cursor')
         if not next_cursor:
             break
-        params = {"query": FILTER, "lang": "es", "cursor": next_cursor}
+        params = {"query": FILTER, "cursor": next_cursor}
 
-    # Construir índice de subtareas a partir de TODAS las tareas de la cuenta
-    todas = _obtener_todas_las_tareas()
-    subtareas_por_padre = defaultdict(list)
-    for tarea in todas:
-        pid = tarea.get('parent_id')
+    # Build subtask index from ALL tasks in the account
+    all_tasks = _get_all_tasks()
+    subtasks_by_parent = defaultdict(list)
+    for task in all_tasks:
+        pid = task.get('parent_id')
         if pid:
-            subtareas_por_padre[pid].append(tarea)
+            subtasks_by_parent[pid].append(task)
 
-    fecha_limite = date.today() + timedelta(days=SUBTASK_DAYS)
+    date_limit = date.today() + timedelta(days=SUBTASK_DAYS)
 
-    grupos = defaultdict(list)
-    fechas_orden = []
+    groups = defaultdict(list)
+    dates_order = []
 
-    for tarea in tareas:
-        due = tarea.get('due') or {}
-        fecha_str = due.get('date', '')
+    for task in tasks:
+        due = task.get('due') or {}
+        date_str = due.get('date', '')
 
-        if tarea.get('parent_id'):
-            if not fecha_str:
+        if task.get('parent_id'):
+            if not date_str:
                 continue
             try:
-                if date.fromisoformat(fecha_str) > fecha_limite:
+                if date.fromisoformat(date_str) > date_limit:
                     continue
             except ValueError:
                 continue
 
-        if fecha_str not in fechas_orden:
-            fechas_orden.append(fecha_str)
-        grupos[fecha_str].append(tarea)
+        if date_str not in dates_order:
+            dates_order.append(date_str)
+        groups[date_str].append(task)
 
-    fechas_orden.sort(key=lambda f: f if f else "9999-99-99")
+    dates_order.sort(key=lambda f: f if f else "9999-99-99")
 
-    return grupos, fechas_orden, subtareas_por_padre
+    return groups, dates_order, subtasks_by_parent
