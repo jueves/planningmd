@@ -38,9 +38,9 @@ def fecha_a_encabezado(fecha_str):
 def obtener_tareas_hoy():
     """Descarga las tareas que corresponden al filtro especificado."""
 
-    url = "https://api.todoist.com/api/v1/tasks"
+    url = "https://api.todoist.com/api/v1/tasks/filter"
     headers = {"Authorization": f"Bearer {API_TOKEN}"}
-    params = {"filter": FILTER}
+    params = {"query": FILTER}
 
     response = requests.get(url, headers=headers, params=params)
     response.raise_for_status()
