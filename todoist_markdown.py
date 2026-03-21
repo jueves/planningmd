@@ -24,9 +24,7 @@ def obtener_tareas_hoy():
     response = requests.get(url, headers=headers, params=params)
     response.raise_for_status()
     
-    data = response.json()
-    print("DEBUG keys:", list(data.keys()) if isinstance(data, dict) else f"type={type(data).__name__}, len={len(data)}")
-    tareas = data.get('items', []) if isinstance(data, dict) else data
+    tareas = response.json().get('results', [])
     
     for tarea in tareas:
         # Usar .get() con valor por defecto para evitar el error
