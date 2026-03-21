@@ -2,13 +2,11 @@ import requests
 from dotenv import load_dotenv
 import os
 from collections import defaultdict
-from datetime import date, timedelta
 
 load_dotenv()
 
 API_TOKEN = os.getenv("TODOIST_API_TOKEN")
 FILTER = os.getenv("TODOIST_FILTER", "today")
-SUBTASK_DAYS = int(os.getenv("SUBTASK_DAYS", "7"))
 
 
 def _get_all_tasks() -> list:
@@ -63,23 +61,12 @@ def get_tasks() -> dict[str, list]:
         if pid:
             subtasks_by_parent[pid].append(task)
 
-    date_limit = date.today() + timedelta(days=SUBTASK_DAYS)
-
     groups = defaultdict(list)
     dates_order = []
 
     for task in tasks:
         due = task.get('due') or {}
         date_str = due.get('date', '')
-
-        if task.get('parent_id'):
-            if not date_str:
-                continue
-            try:
-                if date.fromisoformat(date_str) > date_limit:
-                    continue
-            except ValueError:
-                continue
 
         if date_str not in dates_order:
             dates_order.append(date_str)
