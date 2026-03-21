@@ -42,8 +42,8 @@ def generar_pdf(contenido_markdown: str, ruta_salida: str = None) -> str:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         ruta_salida = f"planning_{timestamp}.pdf"
 
-    md = re.sub(r'^- \[ \] ', r'- <input type="checkbox"> ', contenido_markdown, flags=re.MULTILINE)
-    html_body = markdown.markdown(md, extensions=['extra'])
+    html_body = markdown.markdown(contenido_markdown, extensions=['extra'])
+    html_body = html_body.replace('[ ]', '<input type="checkbox">')
     html_completo = f"""<!DOCTYPE html>
 <html>
 <head>
