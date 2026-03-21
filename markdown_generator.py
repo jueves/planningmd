@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 
 EMOJIS_PRIORIDAD = {
@@ -16,6 +17,16 @@ DIAS_SEMANA = {
     5: "Sábado",
     6: "Domingo",
 }
+
+
+def limpiar_markdown(texto: str) -> str:
+    """Elimina el formato markdown de un texto. En los enlaces conserva solo el título."""
+    texto = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', texto)  # [título](url) → título
+    texto = re.sub(r'[*_]{1,3}([^*_]+)[*_]{1,3}', r'\1', texto)  # negrita/cursiva
+    texto = re.sub(r'`([^`]+)`', r'\1', texto)  # código inline
+    texto = re.sub(r'^#+\s*', '', texto, flags=re.MULTILINE)  # encabezados
+    texto = re.sub(r'\n+', ' ', texto).strip()  # saltos de línea → espacio
+    return texto
 
 
 def fecha_a_encabezado(fecha_str: str) -> str:
@@ -54,7 +65,7 @@ def generar_markdown(grupos: dict, fechas_orden: list, modo_detalles: bool = Fal
                 if etiquetas:
                     partes.append(" ".join(f"`{e}`" for e in etiquetas))
                 if descripcion:
-                    partes.append(f"`{descripcion[:100]}`")
+                    partes.append(limpiar_markdown(descripcion)[:100])
                 lineas.append(f"- [ ] {emoji} {'  '.join(partes)}".rstrip())
             else:
                 lineas.append(f"- [ ] {emoji} {contenido}".rstrip())
