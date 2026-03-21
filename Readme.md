@@ -1,58 +1,58 @@
 # planningmd
 
-Genera un PDF de planificación diaria a partir de las tareas de Todoist, agrupadas por fecha.
+Generates a daily planning PDF from Todoist tasks, grouped by date.
 
-## Requisitos
+## Requirements
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Crea un archivo `.env` en la raíz del proyecto con tu token de Todoist:
+Create a `.env` file in the project root with your Todoist token:
 
 ```
-TODOIST_API_TOKEN=tu_token_aqui
+TODOIST_API_TOKEN=your_token_here
 ```
 
-## Uso
+## Usage
 
 ```bash
 python main.py
 ```
 
-Genera el PDF en el directorio actual e imprime el markdown en consola.
+Generates a PDF in the current directory and prints the markdown to the console.
 
-## Estructura
+## Structure
 
-| Archivo | Descripción |
+| File | Description |
 |---|---|
-| `main.py` | Punto de entrada principal |
-| `todoist_client.py` | Obtiene tareas de la API de Todoist |
-| `markdown_generator.py` | Genera el contenido en Markdown |
-| `html_generator.py` | Convierte a HTML con estilos |
-| `pdf_generator.py` | Exporta el HTML a PDF (WeasyPrint) |
-| `styles.css` | Estilos del PDF |
+| `main.py` | Main entry point |
+| `todoist_client.py` | Fetches tasks from the Todoist API |
+| `markdown_generator.py` | Generates Markdown content |
+| `html_generator.py` | Converts to styled HTML |
+| `pdf_generator.py` | Exports HTML to PDF (WeasyPrint) |
+| `styles.css` | PDF styles |
 
-## Trabajar directamente con todoist_client.py
+## Working directly with todoist_client.py
 
-Desde la carpeta del proyecto, abrir Python y ejecutar:
+From the project folder, open Python and run:
 
 ```python
 from todoist_client import obtener_tareas
 
 grupos, fechas_orden = obtener_tareas()
 
-# Ver las fechas en orden
+# See dates in order
 fechas_orden
 
-# Ver todas las tareas de una fecha
+# See all tasks for a date
 grupos['2026-03-21']
 
-# Ver solo los contenidos de una fecha
+# See only the contents for a date
 [t['content'] for t in grupos['2026-03-21']]
 
-# Ver las claves disponibles en una tarea
+# See available keys in a task
 grupos['2026-03-21'][0].keys()
 ```
 
-Si el `.env` está en la misma carpeta, `load_dotenv()` lo carga automáticamente al importar el módulo, así que no necesitas configurar nada más.
+If the `.env` file is in the same folder, `load_dotenv()` loads it automatically when importing the module, so no further configuration is needed.
