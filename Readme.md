@@ -8,10 +8,15 @@ Generates a daily planning PDF from Todoist tasks, grouped by date.
 pip install -r requirements.txt
 ```
 
-Create a `.env` file in the project root with your Todoist token:
+Create a `.env` file in the project root:
 
 ```
-TODOIST_API_TOKEN=your_token_here
+# Required
+TODOIST_API_TOKEN=your_token_here   # Todoist API token (Settings > Integrations > Developer)
+
+# Optional
+TODOIST_FILTER=today                # Todoist filter query to select tasks (default: "today")
+SUBTASK_DAYS=7                      # Max days ahead to include subtasks (default: 7)
 ```
 
 ## Usage
