@@ -6,25 +6,28 @@ from datetime import datetime
 CSS = """
 body {
     font-family: Arial, sans-serif;
-    font-size: 12pt;
-    margin: 2cm;
+    font-size: 9pt;
+    margin: 0.5cm;
     color: #222;
 }
 h2 {
     color: #2c3e50;
     border-bottom: 1px solid #ccc;
-    padding-bottom: 4px;
-    margin-top: 1.5em;
+    padding-bottom: 2px;
+    margin-top: 0.6em;
+    margin-bottom: 0.2em;
+    font-size: 11pt;
 }
 ul {
     list-style: none;
     padding-left: 0;
+    margin: 0;
 }
 li {
-    padding: 2px 0;
+    padding: 1px 0;
 }
 .desc {
-    font-size: 8pt;
+    font-size: 7pt;
     color: #555;
     margin-left: 1.2em;
 }
