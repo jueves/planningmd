@@ -38,14 +38,20 @@ def fecha_a_encabezado(fecha_str):
 def obtener_tareas_hoy():
     """Descarga las tareas que corresponden al filtro especificado."""
 
-    url = "https://api.todoist.com/api/v1/tasks"
+    url = "https://api.todoist.com/api/v1/tasks/filter"
     headers = {"Authorization": f"Bearer {API_TOKEN}"}
-    params = {"filter": FILTER}
+    params = {"query": FILTER, "lang": "es"}
 
-    response = requests.get(url, headers=headers, params=params)
-    response.raise_for_status()
-
-    tareas = response.json().get('results', [])
+    tareas = []
+    while True:
+        response = requests.get(url, headers=headers, params=params)
+        response.raise_for_status()
+        data = response.json()
+        tareas.extend(data.get('results', []))
+        next_cursor = data.get('next_cursor')
+        if not next_cursor:
+            break
+        params = {"cursor": next_cursor}
 
     grupos = defaultdict(list)
     fechas_orden = []
