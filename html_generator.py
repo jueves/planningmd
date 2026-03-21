@@ -102,5 +102,5 @@ def generar_html(grupos: dict, fechas_orden: list, subtareas_por_padre: dict = N
 
             partes.append(f'<li>{titulo_html}{extra}</li>')
         partes.append('</ul>')
-        bloques.append(f'<div class="bloque-dia">\n' + "\n".join(partes) + '\n</div>')
-    return '<div class="columnas">\n' + "\n".join(bloques) + '\n</div>'
+        bloques.append("\n".join(partes))
+    return "\n".join(bloques)
