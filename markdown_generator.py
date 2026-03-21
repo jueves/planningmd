@@ -1,50 +1,50 @@
 from datetime import datetime
 
-EMOJIS_PRIORIDAD = {
-    4: "🔴",    # p1 - Urgente
-    3: "🟡",    # p2 - Alta
-    2: "🔵",    # p3 - Media
+PRIORITY_EMOJIS = {
+    4: "🔴",    # p1 - Urgent
+    3: "🟡",    # p2 - High
+    2: "🔵",    # p3 - Medium
     1: ""       # p4 - Normal
 }
 
-DIAS_SEMANA = {
-    0: "Lunes",
-    1: "Martes",
-    2: "Miércoles",
-    3: "Jueves",
-    4: "Viernes",
-    5: "Sábado",
-    6: "Domingo",
+WEEKDAYS = {
+    0: "Monday",
+    1: "Tuesday",
+    2: "Wednesday",
+    3: "Thursday",
+    4: "Friday",
+    5: "Saturday",
+    6: "Sunday",
 }
 
 
-def fecha_a_encabezado(fecha_str: str) -> str:
-    """Convierte una fecha ISO a un encabezado legible en español."""
+def date_to_heading(date_str: str) -> str:
+    """Converts an ISO date to a readable heading."""
     try:
-        fecha = datetime.fromisoformat(fecha_str).date()
+        date = datetime.fromisoformat(date_str).date()
     except (ValueError, TypeError):
-        return "Sin fecha"
-    dia = DIAS_SEMANA.get(fecha.weekday(), str(fecha)).upper()
-    return f"{dia} {fecha.strftime('%d/%m/%Y')}"
+        return "No date"
+    day = WEEKDAYS.get(date.weekday(), str(date)).upper()
+    return f"{day} {date.strftime('%d/%m/%Y')}"
 
 
-def generar_markdown(grupos: dict, fechas_orden: list) -> str:
-    """Genera el texto markdown a partir de los grupos de tareas.
+def generate_markdown(groups: dict, dates_order: list) -> str:
+    """Generates markdown text from the task groups.
 
     Args:
-        grupos: dict {fecha_str: [tareas]}
-        fechas_orden: lista de fechas en orden de aparición
+        groups: dict {date_str: [tasks]}
+        dates_order: list of dates in order of appearance
 
     Returns:
-        String con el markdown generado.
+        String with the generated markdown.
     """
-    lineas = []
-    for fecha_str in fechas_orden:
-        encabezado = fecha_a_encabezado(fecha_str) if fecha_str else "Sin fecha"
-        lineas.append(f"## {encabezado}")
-        for tarea in sorted(grupos[fecha_str], key=lambda t: t.get('priority', 1), reverse=True):
-            prioridad = tarea.get('priority', 1)
-            emoji = EMOJIS_PRIORIDAD.get(prioridad, '')
-            contenido = tarea.get('content', '')
-            lineas.append(f"- [ ] {emoji} {contenido}".rstrip())
-    return "\n".join(lineas)
+    lines = []
+    for date_str in dates_order:
+        heading = date_to_heading(date_str) if date_str else "No date"
+        lines.append(f"## {heading}")
+        for task in sorted(groups[date_str], key=lambda t: t.get('priority', 1), reverse=True):
+            priority = task.get('priority', 1)
+            emoji = PRIORITY_EMOJIS.get(priority, '')
+            content = task.get('content', '')
+            lines.append(f"- [ ] {emoji} {content}".rstrip())
+    return "\n".join(lines)
