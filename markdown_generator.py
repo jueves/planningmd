@@ -59,11 +59,8 @@ def generar_markdown(grupos: dict, fechas_orden: list, modo_detalles: bool = Fal
             emoji = EMOJIS_PRIORIDAD.get(prioridad, '')
             contenido = tarea.get('content', '')
             if modo_detalles:
-                etiquetas = tarea.get('labels', [])
                 descripcion = tarea.get('description', '') or ''
                 partes = [f"**{contenido}**"]
-                if etiquetas:
-                    partes.append(" ".join(f"`{e}`" for e in etiquetas))
                 if descripcion:
                     partes.append(limpiar_markdown(descripcion)[:100])
                 lineas.append(f"- [ ] {emoji} {'  '.join(partes)}".rstrip())
