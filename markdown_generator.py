@@ -46,5 +46,5 @@ def generar_markdown(grupos: dict, fechas_orden: list) -> str:
             prioridad = tarea.get('priority', 1)
             emoji = EMOJIS_PRIORIDAD.get(prioridad, '')
             contenido = tarea.get('content', '')
-            lineas.append(f"- [ ] {emoji} {contenido}".rstrip())
+            lineas.append(f"- {emoji} {contenido}".rstrip())
     return "\n".join(lineas)

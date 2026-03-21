@@ -1,4 +1,3 @@
-import re
 import markdown
 from weasyprint import HTML
 from datetime import datetime
@@ -43,7 +42,6 @@ def generar_pdf(contenido_markdown: str, ruta_salida: str = None) -> str:
         ruta_salida = f"planning_{timestamp}.pdf"
 
     html_body = markdown.markdown(contenido_markdown, extensions=['extra'])
-    html_body = html_body.replace('[ ]', '<input type="checkbox">')
     html_completo = f"""<!DOCTYPE html>
 <html>
 <head>
