@@ -1,7 +1,7 @@
 from todoist_client import obtener_tareas
 from markdown_generator import generar_markdown
 from html_generator import generar_html
-from pdf_generator import generar_pdf, generar_pdf_desde_html
+from pdf_generator import generar_pdf_desde_html
 
 
 def main():
