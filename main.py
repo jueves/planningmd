@@ -1,3 +1,4 @@
+import locale
 from todoist_client import get_tasks
 from markdown_generator import generate_markdown
 from html_generator import generate_html
@@ -5,6 +6,7 @@ from pdf_generator import generate_pdf
 
 
 def main():
+    locale.setlocale(locale.LC_TIME, '')
     groups, dates_order, subtasks_by_parent = get_tasks()
     content = generate_markdown(groups, dates_order)
     print(content)
