@@ -83,7 +83,7 @@ def generar_html(grupos: dict, fechas_orden: list) -> str:
             descripcion_limpia = limpiar_markdown(descripcion_raw)[:100]
             descripcion_limpia = _escapar_html(descripcion_limpia)
 
-            titulo_html = f'<strong>{emoji} {contenido}</strong>'.lstrip()
+            titulo_html = f'{emoji} {contenido}'.strip()
             if descripcion_limpia:
                 partes.append(
                     f'<li>{titulo_html}'
