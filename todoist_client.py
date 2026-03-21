@@ -42,7 +42,7 @@ def get_tasks() -> dict[str, list]:
     """
     url = "https://api.todoist.com/api/v1/tasks/filter"
     headers = {"Authorization": f"Bearer {API_TOKEN}"}
-    params = {"query": FILTER, "lang": "en"}
+    params = {"query": FILTER}
 
     tasks = []
     while True:
@@ -53,7 +53,7 @@ def get_tasks() -> dict[str, list]:
         next_cursor = data.get('next_cursor')
         if not next_cursor:
             break
-        params = {"query": FILTER, "lang": "en", "cursor": next_cursor}
+        params = {"query": FILTER, "cursor": next_cursor}
 
     # Build subtask index from ALL tasks in the account
     all_tasks = _get_all_tasks()

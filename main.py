@@ -1,7 +1,7 @@
 from todoist_client import get_tasks
 from markdown_generator import generate_markdown
 from html_generator import generate_html
-from pdf_generator import generate_pdf_from_html
+from pdf_generator import generate_pdf
 
 
 def main():
@@ -9,7 +9,7 @@ def main():
     content = generate_markdown(groups, dates_order)
     print(content)
     html = generate_html(groups, dates_order, subtasks_by_parent)
-    path = generate_pdf_from_html(html)
+    path = generate_pdf(html)
     print(f"\nPDF generated: {path}")
 
 

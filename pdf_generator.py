@@ -16,7 +16,7 @@ def _complete_html(html_content: str, two_columns: bool) -> str:
 </html>"""
 
 
-def generate_pdf_from_html(html_content: str, output_path: str = None, two_columns: bool = False) -> str:
+def generate_pdf(html_content: str, output_path: str = None, two_columns: bool = False) -> str:
     """Generates a PDF from HTML content.
 
     If two_columns is False (default), renders first without columns and
