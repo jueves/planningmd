@@ -41,7 +41,8 @@ def generar_pdf(contenido_markdown: str, ruta_salida: str = None) -> str:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         ruta_salida = f"planning_{timestamp}.pdf"
 
-    html_body = markdown.markdown(contenido_markdown, extensions=['extra'])
+    md = contenido_markdown.replace('- [ ] ', '- ')
+    html_body = markdown.markdown(md, extensions=['extra'])
     html_completo = f"""<!DOCTYPE html>
 <html>
 <head>
