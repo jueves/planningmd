@@ -91,20 +91,34 @@ def _expand_event(component, calendar_name: str, range_start: date, range_end: d
 def _resolve_caldav_url(server_url: str, username: str, password: str) -> list[str]:
     """Return candidate CalDAV base URLs to try, in priority order.
 
-    RFC 6764 defines /.well-known/caldav as the discovery entry point.
-    Many servers redirect that URI to the real CalDAV endpoint (e.g.
-    Fastmail redirects to /dav/, Nextcloud to /remote.php/dav/).
-    PROPFIND does not always follow redirects, so we issue a GET first
-    to resolve the redirect chain and collect the final URL.
+    Candidates, from highest to lowest priority:
+      1. Principal URL built from server host + username, e.g.:
+           https://host/dav/principals/user/<username>/
+         This is the most reliable form for servers like Fastmail that
+         use email-based principal paths.
+      2. The URL resolved by following the /.well-known/caldav redirect
+         via GET (RFC 6764). PROPFIND does not reliably follow redirects,
+         so we resolve the chain manually.
+      3. The server URL and well-known URL as last-resort fallbacks.
     """
     import requests as _req
 
     parsed = urlparse(server_url)
+    base = urlunparse((parsed.scheme, parsed.netloc, "", "", "", ""))
     well_known = urlunparse((parsed.scheme, parsed.netloc, "/.well-known/caldav", "", "", ""))
 
     candidates: list[str] = []
 
-    # Follow the well-known redirect via GET to get the real endpoint URL.
+    def _add(url: str) -> None:
+        if url and url not in candidates:
+            candidates.append(url)
+
+    # 1. Explicit principal URL derived from the username (works for Fastmail
+    #    and other servers that use /dav/principals/user/<email>/ paths).
+    if username:
+        _add(f"{base}/dav/principals/user/{username}/")
+
+    # 2. Follow well-known and server URL redirects via GET.
     for probe_url in (well_known, server_url):
         try:
             resp = _req.get(
@@ -113,16 +127,13 @@ def _resolve_caldav_url(server_url: str, username: str, password: str) -> list[s
                 allow_redirects=True,
                 timeout=10,
             )
-            final = resp.url
-            if final not in candidates:
-                candidates.append(final)
+            _add(resp.url)
         except Exception:
             pass
 
-    # Always include the original URL as a last-resort fallback.
-    for url in (server_url, well_known):
-        if url not in candidates:
-            candidates.append(url)
+    # 3. Verbatim fallbacks.
+    _add(server_url)
+    _add(well_known)
 
     return candidates
 
