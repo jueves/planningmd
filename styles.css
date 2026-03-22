@@ -39,3 +39,8 @@ ul.subtasks {
 ul.subtasks li {
     padding: 0;
 }
+.event-meta {
+    font-size: 7pt;
+    color: #555;
+    margin-left: 1.2em;
+}

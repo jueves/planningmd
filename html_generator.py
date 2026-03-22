@@ -49,24 +49,42 @@ def _escape_html(text: str) -> str:
             .replace('>', '&gt;'))
 
 
-def generate_html(groups: dict, dates_order: list, subtasks_by_parent: dict = None) -> str:
+def generate_html(groups: dict, dates_order: list, subtasks_by_parent: dict = None, events_by_date: dict = None) -> str:
     """Generates HTML with task title, summarized description and subtasks below.
 
     Args:
         groups: dict {date_str: [tasks]}
         dates_order: list of dates in order of appearance
         subtasks_by_parent: dict {parent_id: [subtasks]} with ALL subtasks
+        events_by_date: dict {date_str: [events]} with calendar events
 
     Returns:
         String with the generated HTML (without DOCTYPE/html wrapper).
     """
     if subtasks_by_parent is None:
         subtasks_by_parent = {}
+    if events_by_date is None:
+        events_by_date = {}
 
     blocks = []
     for date_str in dates_order:
         heading = date_to_heading(date_str) if date_str else "No date"
         parts = [f'<h2>{_escape_html(heading)}</h2>', '<ul>']
+
+        # Render calendar events before tasks
+        for event in events_by_date.get(date_str, []):
+            title = _escape_html(event.get('title', ''))
+            calendar = _escape_html(event.get('calendar', ''))
+            start_time = event.get('start_time')
+            end_time = event.get('end_time')
+            if start_time and end_time:
+                time_range = f"De {start_time} a {end_time}"
+                meta = f"{calendar} &mdash; {time_range}" if calendar else time_range
+            else:
+                meta = calendar
+            meta_html = f'<br><span class="event-meta">{meta}</span>' if meta else ''
+            parts.append(f'<li class="event">{title}{meta_html}</li>')
+
         parent_tasks = [t for t in groups[date_str] if not t.get('parent_id')]
         for task in sorted(parent_tasks, key=lambda t: t.get('priority', 1), reverse=True):
             priority = task.get('priority', 1)
