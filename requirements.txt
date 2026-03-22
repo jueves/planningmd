@@ -2,3 +2,7 @@ requests
 python-dotenv
 markdown
 weasyprint
+caldav
+icalendar
+recurring-ical-events
+pytz
