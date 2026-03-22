@@ -16,6 +16,14 @@ def main():
     for event in events:
         events_by_date[event['date']].append(event)
 
+    # Merge event dates not already in dates_order (days with events but no tasks)
+    existing = set(dates_order)
+    for date_str in events_by_date:
+        if date_str and date_str not in existing:
+            dates_order.append(date_str)
+            existing.add(date_str)
+    dates_order.sort(key=lambda f: f if f else "9999-99-99")
+
     content = generate_markdown(groups, dates_order)
     print(content)
     html = generate_html(groups, dates_order, subtasks_by_parent, dict(events_by_date))
