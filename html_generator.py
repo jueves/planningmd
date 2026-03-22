@@ -78,12 +78,10 @@ def generate_html(groups: dict, dates_order: list, subtasks_by_parent: dict = No
             start_time = event.get('start_time')
             end_time = event.get('end_time')
             if start_time and end_time:
-                time_range = f"De {start_time} a {end_time}"
-                meta = f"{calendar} &mdash; {time_range}" if calendar else time_range
+                time_html = f' <span class="event-meta">De {start_time} a {end_time}</span>'
             else:
-                meta = calendar
-            meta_html = f'<br><span class="event-meta">{meta}</span>' if meta else ''
-            parts.append(f'<li class="event">🗓️ {title}{meta_html}</li>')
+                time_html = ''
+            parts.append(f'<li class="event">🗓️ {title}{time_html}</li>')
 
         parent_tasks = [t for t in groups[date_str] if not t.get('parent_id')]
         for task in sorted(parent_tasks, key=lambda t: t.get('priority', 1), reverse=True):
