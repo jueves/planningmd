@@ -88,23 +88,49 @@ def _expand_event(component, calendar_name: str, range_start: date, range_end: d
     return results
 
 
-def _connect(server_url: str, username: str, password: str):
-    """Return (DAVClient, Principal) by trying RFC 6764 autodiscovery paths.
+def _resolve_caldav_url(server_url: str, username: str, password: str) -> list[str]:
+    """Return candidate CalDAV base URLs to try, in priority order.
 
-    Candidates tried in order:
-      1. The URL as provided.
-      2. /.well-known/caldav on the same host (RFC 6764 well-known URI).
-
-    The caldav library follows HTTP redirects, so /.well-known/caldav will
-    transparently resolve to the real CalDAV endpoint even on servers that
-    use a non-root path (e.g. Nextcloud's /remote.php/dav/).
+    RFC 6764 defines /.well-known/caldav as the discovery entry point.
+    Many servers redirect that URI to the real CalDAV endpoint (e.g.
+    Fastmail redirects to /dav/, Nextcloud to /remote.php/dav/).
+    PROPFIND does not always follow redirects, so we issue a GET first
+    to resolve the redirect chain and collect the final URL.
     """
+    import requests as _req
+
     parsed = urlparse(server_url)
     well_known = urlunparse((parsed.scheme, parsed.netloc, "/.well-known/caldav", "", "", ""))
 
-    candidates = [server_url]
-    if well_known != server_url:
-        candidates.append(well_known)
+    candidates: list[str] = []
+
+    # Follow the well-known redirect via GET to get the real endpoint URL.
+    for probe_url in (well_known, server_url):
+        try:
+            resp = _req.get(
+                probe_url,
+                auth=(username, password),
+                allow_redirects=True,
+                timeout=10,
+            )
+            final = resp.url
+            if final not in candidates:
+                candidates.append(final)
+        except Exception:
+            pass
+
+    # Always include the original URL as a last-resort fallback.
+    for url in (server_url, well_known):
+        if url not in candidates:
+            candidates.append(url)
+
+    return candidates
+
+
+def _connect(server_url: str, username: str, password: str):
+    """Return (DAVClient, Principal), trying resolved CalDAV endpoint URLs."""
+    candidates = _resolve_caldav_url(server_url, username, password)
+    logger.debug("CalDAV endpoint candidates: %s", candidates)
 
     last_error: Exception = RuntimeError("No URL candidates to try.")
     for url in candidates:
@@ -113,6 +139,7 @@ def _connect(server_url: str, username: str, password: str):
             principal = client.principal()
             return client, principal
         except Exception as exc:
+            logger.debug("Candidate %s failed: %s", url, exc)
             last_error = exc
 
     raise ConnectionError(
