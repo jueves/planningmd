@@ -1,10 +1,14 @@
+import logging
 import caldav
 from dotenv import load_dotenv
 import os
 from datetime import date, datetime, timedelta
 from urllib.parse import urlparse, urlunparse
 import recurring_ical_events
+from icalendar import Calendar
 import pytz
+
+logger = logging.getLogger(__name__)
 
 load_dotenv()
 
@@ -145,6 +149,19 @@ def get_events() -> list[dict]:
     client, principal = _connect(ICAL_SERVER_URL, ICAL_USERNAME, ICAL_PASSWORD)
     calendars = principal.calendars()
 
+    available_names = [str(c.name or "") for c in calendars]
+    logger.debug("Calendars found on server: %s", available_names)
+
+    if wanted_names:
+        missing = wanted_names - set(available_names)
+        if missing:
+            logger.warning(
+                "ICAL_CALENDAR_NAMES contains names not found on the server: %s. "
+                "Available calendars: %s",
+                sorted(missing),
+                available_names,
+            )
+
     all_events: list[dict] = []
 
     for calendar in calendars:
@@ -152,17 +169,19 @@ def get_events() -> list[dict]:
         if wanted_names and cal_name not in wanted_names:
             continue
 
-        # Fetch only the date range we need; the server expands recurring events.
-        raw_events = calendar.search(
-            start=query_start,
-            end=query_end,
-            event=True,
-            expand=True,
-        )
+        # Use date_search() without server-side expansion (expand=True is not
+        # universally supported). recurring_ical_events handles expansion
+        # client-side, which also covers VTIMEZONE and complex RRULE patterns.
+        raw_objects = calendar.date_search(start=query_start, end=query_end, expand=False)
 
-        for caldav_event in raw_events:
-            ical = caldav_event.icalendar_instance
-            for component in ical.walk("VEVENT"):
+        for caldav_event in raw_objects:
+            try:
+                ical = Calendar.from_ical(caldav_event.data)
+            except Exception as exc:
+                logger.warning("Could not parse event data: %s", exc)
+                continue
+
+            for component in recurring_ical_events.of(ical).between(query_start, query_end):
                 all_events.extend(_expand_event(component, cal_name, today, range_end))
 
     all_events.sort(key=lambda e: (e["date"], e["start_time"] or ""))
