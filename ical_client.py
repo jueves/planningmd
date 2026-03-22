@@ -2,6 +2,7 @@ import caldav
 from dotenv import load_dotenv
 import os
 from datetime import date, datetime, timedelta
+from urllib.parse import urlparse, urlunparse
 import recurring_ical_events
 import pytz
 
@@ -83,6 +84,39 @@ def _expand_event(component, calendar_name: str, range_start: date, range_end: d
     return results
 
 
+def _connect(server_url: str, username: str, password: str):
+    """Return (DAVClient, Principal) by trying RFC 6764 autodiscovery paths.
+
+    Candidates tried in order:
+      1. The URL as provided.
+      2. /.well-known/caldav on the same host (RFC 6764 well-known URI).
+
+    The caldav library follows HTTP redirects, so /.well-known/caldav will
+    transparently resolve to the real CalDAV endpoint even on servers that
+    use a non-root path (e.g. Nextcloud's /remote.php/dav/).
+    """
+    parsed = urlparse(server_url)
+    well_known = urlunparse((parsed.scheme, parsed.netloc, "/.well-known/caldav", "", "", ""))
+
+    candidates = [server_url]
+    if well_known != server_url:
+        candidates.append(well_known)
+
+    last_error: Exception = RuntimeError("No URL candidates to try.")
+    for url in candidates:
+        try:
+            client = caldav.DAVClient(url=url, username=username, password=password)
+            principal = client.principal()
+            return client, principal
+        except Exception as exc:
+            last_error = exc
+
+    raise ConnectionError(
+        f"Could not connect to CalDAV server at {server_url!r}. "
+        f"Tried: {candidates}. Last error: {last_error}"
+    ) from last_error
+
+
 def get_events() -> list[dict]:
     """Connects to a CalDAV server, autodiscovers calendars, and returns events.
 
@@ -108,12 +142,7 @@ def get_events() -> list[dict]:
     query_start = datetime(today.year, today.month, today.day, tzinfo=pytz.UTC)
     query_end = datetime(range_end.year, range_end.month, range_end.day, 23, 59, 59, tzinfo=pytz.UTC)
 
-    client = caldav.DAVClient(
-        url=ICAL_SERVER_URL,
-        username=ICAL_USERNAME,
-        password=ICAL_PASSWORD,
-    )
-    principal = client.principal()
+    client, principal = _connect(ICAL_SERVER_URL, ICAL_USERNAME, ICAL_PASSWORD)
     calendars = principal.calendars()
 
     all_events: list[dict] = []
