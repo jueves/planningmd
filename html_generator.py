@@ -83,7 +83,7 @@ def generate_html(groups: dict, dates_order: list, subtasks_by_parent: dict = No
             else:
                 meta = calendar
             meta_html = f'<br><span class="event-meta">{meta}</span>' if meta else ''
-            parts.append(f'<li class="event">{title}{meta_html}</li>')
+            parts.append(f'<li class="event">🗓️ {title}{meta_html}</li>')
 
         parent_tasks = [t for t in groups[date_str] if not t.get('parent_id')]
         for task in sorted(parent_tasks, key=lambda t: t.get('priority', 1), reverse=True):
