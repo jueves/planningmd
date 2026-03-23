@@ -8,31 +8,31 @@ _QUOTES_PATH = Path(__file__).parent / "quotes.md"
 def get_random_quote() -> dict | None:
     """Parses quotes.md and returns a random quote as a dict with 'text' and 'author' keys.
 
-    Returns None if no valid quotes are found.
+    Quotes are blocks of text between two lines of 3+ hyphens.
+    The author is the text after an em dash (—), if present.
+    Returns None if no quotes are found.
     """
     text = _QUOTES_PATH.read_text(encoding="utf-8")
 
-    # Split on blocks of 3 or more hyphens
-    blocks = re.split(r'-{3,}', text)
+    # Split on lines containing only 3+ hyphens
+    blocks = re.split(r'(?m)^-{3,}\s*$', text)
 
+    # The first block is introductory text before any separator; skip it
     quotes = []
-    for block in blocks:
+    for block in blocks[1:]:
         block = block.strip()
         if not block:
             continue
 
-        # Look for text in double quotes (may span multiple lines)
-        quote_match = re.search(r'"([^"]+)"', block, re.DOTALL)
-        if not quote_match:
-            continue
-
-        quote_text = quote_match.group(1).strip()
-
-        # Look for an author preceded by an em dash (—)
         author_match = re.search(r'—\s*(.+)', block)
         author = author_match.group(1).strip() if author_match else None
 
-        quotes.append({"text": quote_text, "author": author})
+        # Remove the author line to get the quote text, stripping surrounding quotes
+        quote_text = re.sub(r'—\s*.+', '', block).strip()
+        quote_text = re.sub(r'^["\u201c]+|["\u201d]+$', '', quote_text).strip()
+
+        if quote_text:
+            quotes.append({"text": quote_text, "author": author})
 
     if not quotes:
         return None
