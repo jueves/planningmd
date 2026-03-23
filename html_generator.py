@@ -49,18 +49,12 @@ def _escape_html(text: str) -> str:
             .replace('>', '&gt;'))
 
 
-def _quote_html(quote: dict) -> str:
-    """Returns an HTML block for a quote dict with 'text' and 'author' keys."""
-    text = _escape_html(quote["text"])
-    parts = [f'<blockquote class="daily-quote"><p>&#8220;{text}&#8221;</p>']
-    if quote.get("author"):
-        author = _escape_html(quote["author"])
-        parts.append(f'<footer>&#8212; {author}</footer>')
-    parts.append('</blockquote>')
-    return "\n".join(parts)
+def _quote_html(quote: str) -> str:
+    """Returns an HTML block for a quote string."""
+    return f'<blockquote class="daily-quote"><p>{_escape_html(quote)}</p></blockquote>'
 
 
-def generate_html(groups: dict, dates_order: list, subtasks_by_parent: dict = None, events_by_date: dict = None, quote: dict = None) -> str:
+def generate_html(groups: dict, dates_order: list, subtasks_by_parent: dict = None, events_by_date: dict = None, quote: str = None) -> str:
     """Generates HTML with task title, summarized description and subtasks below.
 
     Args:
