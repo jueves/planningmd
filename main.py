@@ -5,6 +5,7 @@ from caldav_client import get_events
 from markdown_generator import generate_markdown
 from html_generator import generate_html
 from pdf_generator import generate_pdf
+from quotes import get_random_quote
 
 
 def main():
@@ -26,7 +27,8 @@ def main():
 
     content = generate_markdown(groups, dates_order)
     print(content)
-    html = generate_html(groups, dates_order, subtasks_by_parent, dict(events_by_date))
+    quote = get_random_quote()
+    html = generate_html(groups, dates_order, subtasks_by_parent, dict(events_by_date), quote=quote)
     path = generate_pdf(html)
     print(f"\nPDF generated: {path}")
 

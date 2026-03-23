@@ -49,7 +49,12 @@ def _escape_html(text: str) -> str:
             .replace('>', '&gt;'))
 
 
-def generate_html(groups: dict, dates_order: list, subtasks_by_parent: dict = None, events_by_date: dict = None) -> str:
+def _quote_html(quote: str) -> str:
+    """Returns an HTML block for a quote string."""
+    return f'<blockquote class="daily-quote"><p>{_escape_html(quote)}</p></blockquote>'
+
+
+def generate_html(groups: dict, dates_order: list, subtasks_by_parent: dict = None, events_by_date: dict = None, quote: str = None) -> str:
     """Generates HTML with task title, summarized description and subtasks below.
 
     Args:
@@ -57,6 +62,7 @@ def generate_html(groups: dict, dates_order: list, subtasks_by_parent: dict = No
         dates_order: list of dates in order of appearance
         subtasks_by_parent: dict {parent_id: [subtasks]} with ALL subtasks
         events_by_date: dict {date_str: [events]} with calendar events
+        quote: optional dict with 'text' and 'author' keys to show at the top
 
     Returns:
         String with the generated HTML (without DOCTYPE/html wrapper).
@@ -67,6 +73,8 @@ def generate_html(groups: dict, dates_order: list, subtasks_by_parent: dict = No
         events_by_date = {}
 
     blocks = []
+    if quote:
+        blocks.append(_quote_html(quote))
     for date_str in dates_order:
         heading = date_to_heading(date_str) if date_str else "No date"
         parts = [f'<h2>{_escape_html(heading)}</h2>', '<ul>']
