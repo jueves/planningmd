@@ -7,12 +7,13 @@ _CSS_PATH = Path(__file__).parent / "styles.css"
 
 def _complete_html(html_content: str, two_columns: bool) -> str:
     body = f'<div class="columnas">{html_content}</div>' if two_columns else html_content
+    timestamp = datetime.now().strftime('%d/%m/%Y  %H:%M')
     return f"""<!DOCTYPE html>
 <html>
 <head>
 <meta charset="utf-8">
 </head>
-<body>{body}</body>
+<body><div id="timestamp">{timestamp}</div>{body}</body>
 </html>"""
 
 
