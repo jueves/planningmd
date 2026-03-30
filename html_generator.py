@@ -72,6 +72,12 @@ def generate_html(groups: dict, dates_order: list, subtasks_by_parent: dict = No
     if events_by_date is None:
         events_by_date = {}
 
+    # Collect all task IDs that appear in the filtered results (across all dates)
+    all_filtered_task_ids = set()
+    for date_str in dates_order:
+        for t in groups[date_str]:
+            all_filtered_task_ids.add(t.get('id'))
+
     blocks = []
     if quote:
         blocks.append(_quote_html(quote))
@@ -92,7 +98,9 @@ def generate_html(groups: dict, dates_order: list, subtasks_by_parent: dict = No
             parts.append(f'<li class="event">🗓️ {title}{time_html}</li>')
 
         parent_tasks = [t for t in groups[date_str] if not t.get('parent_id')]
-        for task in sorted(parent_tasks, key=lambda t: t.get('priority', 1), reverse=True):
+        child_tasks = [t for t in groups[date_str] if t.get('parent_id')]
+        all_tasks = parent_tasks + child_tasks
+        for task in sorted(all_tasks, key=lambda t: t.get('priority', 1), reverse=True):
             priority = task.get('priority', 1)
             emoji = PRIORITY_EMOJIS.get(priority, '')
             content = _escape_html(task.get('content', ''))
@@ -106,6 +114,8 @@ def generate_html(groups: dict, dates_order: list, subtasks_by_parent: dict = No
                 extra += f'<br><span class="desc">{clean_description}</span>'
 
             subtasks = subtasks_by_parent.get(task.get('id'), [])
+            # Exclude subtasks that already appear as independent tasks in the filtered results
+            subtasks = [s for s in subtasks if s.get('id') not in all_filtered_task_ids]
             if subtasks:
                 items = ''.join(
                     f'<li>{_escape_html(s.get("content", ""))}</li>'
