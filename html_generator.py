@@ -92,7 +92,9 @@ def generate_html(groups: dict, dates_order: list, subtasks_by_parent: dict = No
             parts.append(f'<li class="event">🗓️ {title}{time_html}</li>')
 
         parent_tasks = [t for t in groups[date_str] if not t.get('parent_id')]
-        for task in sorted(parent_tasks, key=lambda t: t.get('priority', 1), reverse=True):
+        child_tasks = [t for t in groups[date_str] if t.get('parent_id')]
+        all_tasks = parent_tasks + child_tasks
+        for task in sorted(all_tasks, key=lambda t: t.get('priority', 1), reverse=True):
             priority = task.get('priority', 1)
             emoji = PRIORITY_EMOJIS.get(priority, '')
             content = _escape_html(task.get('content', ''))
