@@ -10,6 +10,9 @@ import pytz
 
 logger = logging.getLogger(__name__)
 
+# Use the system's local timezone for displaying event times.
+LOCAL_TZ = datetime.now().astimezone().tzinfo
+
 load_dotenv()
 
 ICAL_SERVER_URL = os.getenv("ICAL_SERVER_URL", "")
@@ -32,7 +35,7 @@ def _expand_event(component, calendar_name: str, range_start: date, range_end: d
     """Expands one iCal VEVENT component into one dict per day within the range.
 
     All-day events: start_time and end_time are None.
-    Timed events: start_time / end_time in HH:MM (UTC).
+    Timed events: start_time / end_time in HH:MM (system local timezone).
     Multi-day timed events: intermediate days get 00:00 / 23:59.
     """
     dt_start_prop = component.get("DTSTART")
@@ -63,12 +66,12 @@ def _expand_event(component, calendar_name: str, range_start: date, range_end: d
                 entry_end = None
             else:
                 entry_start = (
-                    start_dt.astimezone(pytz.UTC).strftime("%H:%M")
+                    start_dt.astimezone(LOCAL_TZ).strftime("%H:%M")
                     if current == start_dt.date()
                     else "00:00"
                 )
                 entry_end = (
-                    end_dt.astimezone(pytz.UTC).strftime("%H:%M")
+                    end_dt.astimezone(LOCAL_TZ).strftime("%H:%M")
                     if current == end_dt.date()
                     else "23:59"
                 )
@@ -169,8 +172,8 @@ def get_events() -> list[dict]:
         - title       : event title
         - calendar    : calendar display name
         - date        : ISO date string (YYYY-MM-DD)
-        - start_time  : "HH:MM" UTC, or None for all-day events
-        - end_time    : "HH:MM" UTC, or None for all-day events
+        - start_time  : "HH:MM" in system local timezone, or None for all-day events
+        - end_time    : "HH:MM" in system local timezone, or None for all-day events
 
     Multi-day events produce one dict per day within the range.
     """
@@ -181,8 +184,8 @@ def get_events() -> list[dict]:
 
     today = date.today()
     range_end = today + timedelta(days=ICAL_DAYS_AHEAD)
-    query_start = datetime(today.year, today.month, today.day, tzinfo=pytz.UTC)
-    query_end = datetime(range_end.year, range_end.month, range_end.day, 23, 59, 59, tzinfo=pytz.UTC)
+    query_start = datetime(today.year, today.month, today.day, tzinfo=LOCAL_TZ)
+    query_end = datetime(range_end.year, range_end.month, range_end.day, 23, 59, 59, tzinfo=LOCAL_TZ)
 
     client, principal = _connect(ICAL_SERVER_URL, ICAL_USERNAME, ICAL_PASSWORD)
     calendars = principal.calendars()
