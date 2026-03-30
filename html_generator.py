@@ -73,6 +73,8 @@ def generate_html(groups: dict, dates_order: list, subtasks_by_parent: dict = No
         events_by_date = {}
 
     blocks = []
+    timestamp = datetime.now().strftime('%d/%m/%Y  %H:%M')
+    blocks.append(f'<div class="timestamp">{timestamp}</div>')
     if quote:
         blocks.append(_quote_html(quote))
     for date_str in dates_order:

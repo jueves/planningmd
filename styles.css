@@ -8,6 +8,12 @@ body {
     column-count: 2;
     column-gap: 0.6cm;
 }
+.timestamp {
+    font-size: 7pt;
+    color: #999;
+    text-align: right;
+    margin-bottom: 0.2em;
+}
 h2 {
     color: #2c3e50;
     border-bottom: 1px solid #ccc;
