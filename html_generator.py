@@ -72,12 +72,6 @@ def generate_html(groups: dict, dates_order: list, subtasks_by_parent: dict = No
     if events_by_date is None:
         events_by_date = {}
 
-    # Collect all task IDs that appear in the filtered results (across all dates)
-    all_filtered_task_ids = set()
-    for date_str in dates_order:
-        for t in groups[date_str]:
-            all_filtered_task_ids.add(t.get('id'))
-
     blocks = []
     if quote:
         blocks.append(_quote_html(quote))
@@ -114,8 +108,6 @@ def generate_html(groups: dict, dates_order: list, subtasks_by_parent: dict = No
                 extra += f'<br><span class="desc">{clean_description}</span>'
 
             subtasks = subtasks_by_parent.get(task.get('id'), [])
-            # Exclude subtasks that already appear as independent tasks in the filtered results
-            subtasks = [s for s in subtasks if s.get('id') not in all_filtered_task_ids]
             if subtasks:
                 items = ''.join(
                     f'<li>{_escape_html(s.get("content", ""))}</li>'
