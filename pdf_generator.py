@@ -7,13 +7,12 @@ _CSS_PATH = Path(__file__).parent / "styles.css"
 
 def _complete_html(html_content: str, two_columns: bool) -> str:
     body = f'<div class="columnas">{html_content}</div>' if two_columns else html_content
-    timestamp = datetime.now().strftime('%d/%m/%Y  %H:%M')
     return f"""<!DOCTYPE html>
 <html>
 <head>
 <meta charset="utf-8">
 </head>
-<body><div id="timestamp">{timestamp}</div>{body}</body>
+<body>{body}</body>
 </html>"""
 
 
@@ -37,7 +36,18 @@ def generate_pdf(html_content: str, output_path: str = None, two_columns: bool =
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         output_path = f"planning_{timestamp}.pdf"
 
-    styles = [CSS(filename=str(_CSS_PATH))]
+    ts = datetime.now().strftime('%d/%m/%Y  %H:%M')
+    footer_css = CSS(string=f"""
+        @page {{
+            @bottom-center {{
+                font-family: Arial, sans-serif;
+                font-size: 6pt;
+                color: #bbb;
+                content: "{ts}";
+            }}
+        }}
+    """)
+    styles = [CSS(filename=str(_CSS_PATH)), footer_css]
 
     if two_columns:
         HTML(string=_complete_html(html_content, two_columns=True)).write_pdf(

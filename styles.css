@@ -8,18 +8,6 @@ body {
     column-count: 2;
     column-gap: 0.6cm;
 }
-@page {
-    @bottom-center {
-        font-family: Arial, sans-serif;
-        font-size: 6pt;
-        color: #bbb;
-        content: string(timestamp);
-    }
-}
-#timestamp {
-    string-set: timestamp content();
-    display: none;
-}
 h2 {
     color: #2c3e50;
     border-bottom: 1px solid #ccc;
