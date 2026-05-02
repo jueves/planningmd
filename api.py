@@ -4,11 +4,9 @@ from collections import defaultdict
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Query
-from fastapi.responses import FileResponse
 
 from caldav_client import get_events
 from html_generator import generate_html
-from markdown_generator import generate_markdown
 from pdf_generator import generate_pdf
 from quotes import get_random_quote
 from todoist_client import get_tasks
@@ -20,7 +18,7 @@ ACCESS_TOKEN = os.getenv("ACCESS_TOKEN", "")
 app = FastAPI(title="PlanningMD API")
 
 
-@app.get("/generate", response_class=FileResponse)
+@app.get("/generate")
 def generate(access_token: str = Query(..., description="API access token")):
     if not ACCESS_TOKEN or access_token != ACCESS_TOKEN:
         raise HTTPException(status_code=401, detail="Invalid access token")
@@ -45,4 +43,4 @@ def generate(access_token: str = Query(..., description="API access token")):
     html = generate_html(groups, dates_order, subtasks_by_parent, dict(events_by_date), quote=quote)
     path = generate_pdf(html)
 
-    return FileResponse(path, media_type="application/pdf", filename="planning.pdf")
+    return {"path": path}
