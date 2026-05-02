@@ -2,9 +2,9 @@ import re
 from datetime import datetime
 
 PRIORITY_EMOJIS = {
-    4: "🔴",    # p1 - Urgent
-    3: "🟡",    # p2 - High
-    2: "🔵",    # p3 - Medium
+    4: "1️⃣🔴",    # p1 - Urgent
+    3: "2️⃣🟡",    # p2 - High
+    2: "3️⃣🔵",    # p3 - Medium
     1: ""       # p4 - Normal
 }
 
