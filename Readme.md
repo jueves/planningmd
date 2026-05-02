@@ -11,6 +11,9 @@ pip install -r requirements.txt
 Create a `.env` file in the project root:
 
 ```
+# API access token (required when using the FastAPI server)
+ACCESS_TOKEN=your-secret-access-token
+
 # Required
 TODOIST_API_TOKEN=your_token_here   # Todoist API token (Settings > Integrations > Developer)
 
@@ -27,17 +30,34 @@ ICAL_DAYS_AHEAD=7                   # Number of days ahead to fetch events (defa
 
 ## Usage
 
+### Script
+
 ```bash
-python main.py
+python planning_generator.py
 ```
 
 Generates a PDF in the current directory and prints the markdown to the console.
+
+### API
+
+```bash
+uvicorn api:app --reload
+```
+
+Then call:
+
+```bash
+curl "http://localhost:8000/generate?access_token=your-secret-access-token"
+```
+
+Returns `{"status": "ok"}` and generates the PDF locally.
 
 ## Structure
 
 | File | Description |
 |---|---|
-| `main.py` | Main entry point |
+| `planning_generator.py` | Main entry point (CLI) |
+| `api.py` | FastAPI server |
 | `todoist_client.py` | Fetches tasks from the Todoist API |
 | `caldav_client.py` | Fetches events from a CalDAV server |
 | `markdown_generator.py` | Generates Markdown content |

@@ -8,7 +8,7 @@ from pdf_generator import generate_pdf
 from quotes import get_random_quote
 
 
-def main():
+def generate_planning():
     locale.setlocale(locale.LC_TIME, '')
     groups, dates_order, subtasks_by_parent = get_tasks()
 
@@ -34,4 +34,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    generate_planning()
