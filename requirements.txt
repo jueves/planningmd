@@ -6,3 +6,5 @@ caldav
 icalendar
 recurring-ical-events
 pytz
+fastapi
+uvicorn
