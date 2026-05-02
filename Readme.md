@@ -46,8 +46,8 @@ uvicorn api:app --reload
 
 Then call:
 
-```
-GET /generate?access_token=your-secret-access-token
+```bash
+curl "http://localhost:8000/generate?access_token=your-secret-access-token"
 ```
 
 Returns `{"status": "ok"}` and generates the PDF locally.
