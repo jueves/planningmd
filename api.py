@@ -3,7 +3,7 @@ import os
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Query
 
-from main import generate_planning
+from planning_generator import generate_planning
 
 load_dotenv()
 
