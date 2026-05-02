@@ -43,4 +43,4 @@ def generate(access_token: str = Query(..., description="API access token")):
     html = generate_html(groups, dates_order, subtasks_by_parent, dict(events_by_date), quote=quote)
     path = generate_pdf(html)
 
-    return {"path": path}
+    return {"status": "ok"}
