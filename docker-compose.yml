@@ -1,6 +1,6 @@
 services:
   api:
-    buil: .
+    build: .
     ports:
       - "3002:3001"
     volumes:
