@@ -1,0 +1,9 @@
+services:
+  api:
+    buil: .
+    ports:
+      - "3002:3001"
+    volumes:
+      - ./.env:/planningmd/.env
+    restart: unless-stopped
+
