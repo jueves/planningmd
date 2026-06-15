@@ -1,6 +1,4 @@
 requests
-python-dotenv
-markdown
 weasyprint
 caldav
 icalendar

@@ -1,6 +1,5 @@
 import logging
 import caldav
-from dotenv import load_dotenv
 import os
 from datetime import date, datetime, timedelta
 from urllib.parse import urlparse, urlunparse
@@ -12,8 +11,6 @@ logger = logging.getLogger(__name__)
 
 # Use the system's local timezone for displaying event times.
 LOCAL_TZ = datetime.now().astimezone().tzinfo
-
-load_dotenv()
 
 ICAL_SERVER_URL = os.getenv("ICAL_SERVER_URL", "")
 ICAL_USERNAME = os.getenv("ICAL_USERNAME", "")

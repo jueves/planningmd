@@ -1,9 +1,7 @@
 import requests
-from dotenv import load_dotenv
 import os
 from collections import defaultdict
 
-load_dotenv()
 
 API_TOKEN = os.getenv("TODOIST_API_TOKEN")
 FILTER = os.getenv("TODOIST_FILTER", "today")
