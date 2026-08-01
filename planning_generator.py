@@ -8,7 +8,7 @@ from pdf_generator import generate_pdf
 from quotes import get_random_quote
 
 
-def generate_planning():
+def generate_planning(columns: str = "2"):
     locale.setlocale(locale.LC_TIME, '')
     groups, dates_order, subtasks_by_parent = get_tasks()
 
@@ -29,7 +29,7 @@ def generate_planning():
     print(content)
     quote = get_random_quote()
     html = generate_html(groups, dates_order, subtasks_by_parent, dict(events_by_date), quote=quote)
-    path = generate_pdf(html)
+    path = generate_pdf(html, columns=columns)
     print(f"\nPDF generated: {path}")
     return path
 

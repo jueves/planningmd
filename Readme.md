@@ -132,6 +132,17 @@ Returns `{"status": "ok", "printed": "pdfs/planning_YYYYMMDD_HHMMSS.pdf"}`. The
 PDF is sent to the print queue `PRINTER_NAME` on the CUPS server `CUPS_SERVER`
 (IPP, port 631) using `lp`, so CUPS handles drivers and format conversion.
 
+Both endpoints accept an optional `columns` parameter to control the layout:
+
+- `2` (default): force a two-column layout.
+- `1`: force a single-column layout.
+- `auto`: single column, switching to two columns only if the content takes
+  more than one page.
+
+```bash
+curl "http://localhost:8000/generate?access_token=your-secret-access-token&columns=auto"
+```
+
 ## Structure
 
 | File | Description |
