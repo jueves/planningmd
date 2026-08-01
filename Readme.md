@@ -156,6 +156,26 @@ matching the `TODOIST_FILTER2` Todoist filter (both read from `.env`).
 curl "http://localhost:8000/generate?access_token=your-secret-access-token&extended_mode=true"
 ```
 
+Both endpoints also accept an optional `QR` parameter. With `QR=true`, a QR
+code is floated at the top right of the content (with the text flowing around
+it) linking to a Todoist search for all tasks created after the document was
+generated:
+
+```bash
+curl "http://localhost:8000/generate?access_token=your-secret-access-token&QR=true"
+```
+
+The `qr_target` parameter controls what the QR code links to:
+
+- `app` (default): a `todoist://` deep link that opens the search directly in
+  the Todoist mobile app.
+- `web`: an `https://app.todoist.com` URL that opens the search in a browser
+  (or in the app, if the OS routes Todoist links to it).
+
+```bash
+curl "http://localhost:8000/generate?access_token=your-secret-access-token&QR=true&qr_target=web"
+```
+
 ## Structure
 
 | File | Description |
@@ -167,6 +187,7 @@ curl "http://localhost:8000/generate?access_token=your-secret-access-token&exten
 | `markdown_generator.py` | Generates Markdown content |
 | `html_generator.py` | Converts to styled HTML |
 | `pdf_generator.py` | Exports HTML to PDF (WeasyPrint) |
+| `qr_generator.py` | Builds the Todoist search URL and its QR code (SVG) |
 | `printer.py` | Sends the PDF to a CUPS print queue (`lp`) |
 | `styles.css` | PDF styles |
 

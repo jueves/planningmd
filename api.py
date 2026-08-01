@@ -25,10 +25,17 @@ def generate(
     extended_mode: bool = Query(
         False, description="Append an extra section (TODOIST_TITLE2 heading + tasks matching TODOIST_FILTER2)"
     ),
+    qr: bool = Query(
+        False, alias="QR",
+        description="Add a QR code linking to a Todoist search for tasks created after the document generation"
+    ),
+    qr_target: Literal["app", "web"] = Query(
+        "app", description="QR link target: 'app' (todoist:// deep link that opens the mobile app) or 'web' (https URL)"
+    ),
 ):
     _check_token(access_token)
 
-    generate_planning(columns=columns, extended_mode=extended_mode)
+    generate_planning(columns=columns, extended_mode=extended_mode, qr=qr, qr_target=qr_target)
 
     return {"status": "ok"}
 
@@ -42,10 +49,17 @@ def print_planning(
     extended_mode: bool = Query(
         False, description="Append an extra section (TODOIST_TITLE2 heading + tasks matching TODOIST_FILTER2)"
     ),
+    qr: bool = Query(
+        False, alias="QR",
+        description="Add a QR code linking to a Todoist search for tasks created after the document generation"
+    ),
+    qr_target: Literal["app", "web"] = Query(
+        "app", description="QR link target: 'app' (todoist:// deep link that opens the mobile app) or 'web' (https URL)"
+    ),
 ):
     _check_token(access_token)
 
-    path = generate_planning(columns=columns, extended_mode=extended_mode)
+    path = generate_planning(columns=columns, extended_mode=extended_mode, qr=qr, qr_target=qr_target)
 
     try:
         print_pdf(path)

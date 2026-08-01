@@ -6,7 +6,9 @@ _CSS_PATH = Path(__file__).parent / "styles.css"
 _OUTPUT_DIR = Path(__file__).parent / "pdfs"
 
 
-def _complete_html(html_content: str, two_columns: bool) -> str:
+def _complete_html(html_content: str, two_columns: bool, qr_svg: str = None) -> str:
+    if qr_svg:
+        html_content = f'<div class="qr-float">{qr_svg}</div>{html_content}'
     body = f'<div class="columnas">{html_content}</div>' if two_columns else html_content
     return f"""<!DOCTYPE html>
 <html>
@@ -17,7 +19,7 @@ def _complete_html(html_content: str, two_columns: bool) -> str:
 </html>"""
 
 
-def generate_pdf(html_content: str, output_path: str = None, columns: str = "2") -> str:
+def generate_pdf(html_content: str, output_path: str = None, columns: str = "2", qr_svg: str = None) -> str:
     """Generates a PDF from HTML content.
 
     Args:
@@ -29,6 +31,8 @@ def generate_pdf(html_content: str, output_path: str = None, columns: str = "2")
                  "1" forces a single column, and "auto" renders a single
                  column first and re-renders with two columns if the
                  result takes more than one page.
+        qr_svg: Optional SVG string with a QR code floated at the top
+                right of the content, with the text flowing around it.
 
     Returns:
         Path of the generated PDF file.
@@ -55,17 +59,17 @@ def generate_pdf(html_content: str, output_path: str = None, columns: str = "2")
     styles = [CSS(filename=str(_CSS_PATH)), footer_css]
 
     if columns == "2":
-        HTML(string=_complete_html(html_content, two_columns=True)).write_pdf(
+        HTML(string=_complete_html(html_content, two_columns=True, qr_svg=qr_svg)).write_pdf(
             output_path, stylesheets=styles
         )
         return output_path
 
-    document = HTML(string=_complete_html(html_content, two_columns=False)).render(
+    document = HTML(string=_complete_html(html_content, two_columns=False, qr_svg=qr_svg)).render(
         stylesheets=styles
     )
     if columns == "auto" and len(document.pages) > 1:
         print(f"PDF has {len(document.pages)} pages, regenerating with two columns...")
-        HTML(string=_complete_html(html_content, two_columns=True)).write_pdf(
+        HTML(string=_complete_html(html_content, two_columns=True, qr_svg=qr_svg)).write_pdf(
             output_path, stylesheets=styles
         )
     else:
