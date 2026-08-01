@@ -104,7 +104,9 @@ It should list the print queue defined in `PRINTER_NAME`.
 python planning_generator.py
 ```
 
-Generates a PDF in the current directory and prints the markdown to the console.
+Generates a PDF in the `pdfs/` directory (created if missing) and prints the
+markdown to the console. When running with Docker Compose, `./pdfs` is mounted
+into the container, so the generated PDFs appear in that directory on the host.
 
 ### API
 
@@ -126,7 +128,7 @@ To generate **and print** the PDF on the configured network printer:
 curl "http://localhost:8000/print?access_token=your-secret-access-token"
 ```
 
-Returns `{"status": "ok", "printed": "planning_YYYYMMDD_HHMMSS.pdf"}`. The
+Returns `{"status": "ok", "printed": "pdfs/planning_YYYYMMDD_HHMMSS.pdf"}`. The
 PDF is sent to the print queue `PRINTER_NAME` on the CUPS server `CUPS_SERVER`
 (IPP, port 631) using `lp`, so CUPS handles drivers and format conversion.
 
