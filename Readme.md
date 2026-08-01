@@ -151,6 +151,17 @@ search for all tasks created after the document was generated:
 curl "http://localhost:8000/generate?access_token=your-secret-access-token&QR=true"
 ```
 
+The `qr_target` parameter controls what the QR code links to:
+
+- `app` (default): a `todoist://` deep link that opens the search directly in
+  the Todoist mobile app.
+- `web`: an `https://app.todoist.com` URL that opens the search in a browser
+  (or in the app, if the OS routes Todoist links to it).
+
+```bash
+curl "http://localhost:8000/generate?access_token=your-secret-access-token&QR=true&qr_target=web"
+```
+
 ## Structure
 
 | File | Description |

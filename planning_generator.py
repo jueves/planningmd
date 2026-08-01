@@ -10,7 +10,7 @@ from qr_generator import build_created_after_url, generate_qr_svg
 from quotes import get_random_quote
 
 
-def generate_planning(columns: str = "2", qr: bool = False):
+def generate_planning(columns: str = "2", qr: bool = False, qr_target: str = "app"):
     locale.setlocale(locale.LC_TIME, '')
     generation_time = datetime.now()
     groups, dates_order, subtasks_by_parent = get_tasks()
@@ -32,7 +32,7 @@ def generate_planning(columns: str = "2", qr: bool = False):
     print(content)
     quote = get_random_quote()
     html = generate_html(groups, dates_order, subtasks_by_parent, dict(events_by_date), quote=quote)
-    qr_svg = generate_qr_svg(build_created_after_url(generation_time)) if qr else None
+    qr_svg = generate_qr_svg(build_created_after_url(generation_time, target=qr_target)) if qr else None
     path = generate_pdf(html, columns=columns, qr_svg=qr_svg)
     print(f"\nPDF generated: {path}")
     return path

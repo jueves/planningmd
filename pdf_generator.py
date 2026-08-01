@@ -9,7 +9,7 @@ _OUTPUT_DIR = Path(__file__).parent / "pdfs"
 def _complete_html(html_content: str, two_columns: bool, qr_svg: str = None) -> str:
     body = f'<div class="columnas">{html_content}</div>' if two_columns else html_content
     if qr_svg:
-        body = f'<div class="qr-corner">{qr_svg}</div>{body}'
+        body = f'<div class="qr-header">{qr_svg}</div>{body}'
     return f"""<!DOCTYPE html>
 <html>
 <head>

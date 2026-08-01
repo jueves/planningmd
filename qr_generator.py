@@ -5,13 +5,20 @@ import qrcode
 import qrcode.image.svg
 
 
-def build_created_after_url(moment: datetime) -> str:
+def build_created_after_url(moment: datetime, target: str = "app") -> str:
     """Builds a Todoist search URL for tasks created after the given moment.
 
-    Opening the URL in a browser runs the search in the Todoist web app.
+    Args:
+        moment: Search for tasks created after this datetime.
+        target: "app" builds a todoist:// deep link that opens the search in
+                the mobile app; "web" builds an https URL for the web app.
     """
-    query = f"created after: {moment.strftime('%m/%d/%Y %H:%M')}"
-    return f"https://app.todoist.com/app/search/{quote(query, safe='')}"
+    if target not in ("app", "web"):
+        raise ValueError(f"Invalid QR target: {target!r} (expected 'app' or 'web')")
+    query = quote(f"created after: {moment.strftime('%m/%d/%Y %H:%M')}", safe="")
+    if target == "app":
+        return f"todoist://search?query={query}"
+    return f"https://app.todoist.com/app/search/{query}"
 
 
 def generate_qr_svg(data: str) -> str:
