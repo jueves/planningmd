@@ -28,8 +28,8 @@ ICAL_CALENDAR_NAMES=Personal,Work   # Comma-separated list; leave empty to inclu
 ICAL_DAYS_AHEAD=7                   # Number of days ahead to fetch events (default: 7)
 
 # Network printer (optional — required only for the /print endpoint)
-PRINTER_URI=ipp://192.168.1.50:631/ipp/print   # IPP URI of the network printer
-PRINTER_JOB_USER=planningmd                     # Name attached to the print job
+PRINTER_HOST=192.168.1.50          # IP/hostname of the network printer
+PRINTER_PORT=9100                  # Raw printing port (default: 9100)
 ```
 
 ## Usage
@@ -63,9 +63,8 @@ curl "http://localhost:8000/print?access_token=your-secret-access-token"
 ```
 
 Returns `{"status": "ok", "printed": "planning_YYYYMMDD_HHMMSS.pdf"}`. The
-printer is defined by `PRINTER_URI` in the `.env` file (see above). Printing
-uses IPP directly, so any network printer supporting IPP Everywhere works
-without drivers or a CUPS server.
+printer is defined by `PRINTER_HOST` in the `.env` file (see above). The PDF
+is sent directly to the printer over the raw printing port (9100).
 
 ## Structure
 
@@ -78,7 +77,7 @@ without drivers or a CUPS server.
 | `markdown_generator.py` | Generates Markdown content |
 | `html_generator.py` | Converts to styled HTML |
 | `pdf_generator.py` | Exports HTML to PDF (WeasyPrint) |
-| `printer.py` | Sends the PDF to a network printer via IPP |
+| `printer.py` | Sends the PDF to a network printer (raw port 9100) |
 | `styles.css` | PDF styles |
 
 ## Working directly with todoist_client.py
