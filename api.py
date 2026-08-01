@@ -33,6 +33,7 @@ def print_planning(access_token: str = Query(..., description="API access token"
     try:
         print_pdf(path)
     except Exception as exc:
+        print(f"Printing failed: {exc}")
         raise HTTPException(status_code=500, detail=f"Printing failed: {exc}")
 
     return {"status": "ok", "printed": path}
