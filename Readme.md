@@ -32,6 +32,30 @@ CUPS_SERVER=192.168.1.10           # CUPS server host (or host:port; port defaul
 PRINTER_NAME=my-printer            # Print queue name on that CUPS server
 ```
 
+If the CUPS server runs in another Docker container on the same host, connect
+both containers through a shared network instead of going through the host:
+
+```bash
+docker network create printing
+```
+
+The `docker-compose.yml` of this project already joins the external `printing`
+network. Attach the CUPS service to it too (in the CUPS project's compose file):
+
+```yaml
+services:
+  cups:
+    # ...
+    networks: [default, printing]
+networks:
+  printing:
+    external: true
+```
+
+Then set `CUPS_SERVER=cups` (the CUPS container's service name) in `.env`, and
+make sure the CUPS `cupsd.conf` listens on all interfaces (`Port 631`) and
+allows the Docker subnet (e.g. `Allow 172.16.0.0/12` inside `<Location />`).
+
 ## Usage
 
 ### Script

@@ -9,4 +9,13 @@ services:
     volumes:
       - ./quotes.md:/planningmd/quotes.md
     restart: unless-stopped
+    networks:
+      - default
+      # Shared network with the CUPS server container (same host).
+      # Create it once with: docker network create printing
+      # and attach the cups service to it too. Then CUPS_SERVER=cups.
+      - printing
 
+networks:
+  printing:
+    external: true
