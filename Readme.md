@@ -20,6 +20,10 @@ TODOIST_API_TOKEN=your_token_here   # Todoist API token (Settings > Integrations
 # Optional
 TODOIST_FILTER=today                # Todoist filter query to select tasks (default: "today")
 
+# Extended mode (optional — used only when calling the API with extended_mode=true)
+TODOIST_TITLE2=Later                # Heading shown before the extra section
+TODOIST_FILTER2=7 days              # Todoist filter query for the extra section's tasks
+
 # CalDAV / iCal (optional — leave empty to skip calendar events)
 ICAL_SERVER_URL=https://caldav.example.com
 ICAL_USERNAME=user@example.com
@@ -141,6 +145,15 @@ Both endpoints accept an optional `columns` parameter to control the layout:
 
 ```bash
 curl "http://localhost:8000/generate?access_token=your-secret-access-token&columns=auto"
+```
+
+Both endpoints also accept an optional `extended_mode` parameter (default
+`false`). When `true`, after the regular planning content an extra section is
+appended: a heading with the value of `TODOIST_TITLE2` followed by the tasks
+matching the `TODOIST_FILTER2` Todoist filter (both read from `.env`).
+
+```bash
+curl "http://localhost:8000/generate?access_token=your-secret-access-token&extended_mode=true"
 ```
 
 Both endpoints also accept an optional `QR` parameter. With `QR=true`, a QR

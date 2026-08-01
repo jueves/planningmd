@@ -27,8 +27,12 @@ def _get_all_tasks() -> list:
     return tasks
 
 
-def get_tasks() -> dict[str, list]:
+def get_tasks(filter_query: str = None) -> dict[str, list]:
     """Downloads the tasks matching the filter and groups them by date.
+
+    Args:
+        filter_query: Todoist filter query. Defaults to the TODOIST_FILTER
+            environment variable.
 
     Returns:
         Tuple (groups, dates_order, subtasks_by_parent) where groups is a
@@ -36,9 +40,12 @@ def get_tasks() -> dict[str, list]:
         and subtasks_by_parent is a dict {parent_id: [subtasks]} with all
         subtasks in the account.
     """
+    if filter_query is None:
+        filter_query = FILTER
+
     url = "https://api.todoist.com/api/v1/tasks/filter"
     headers = {"Authorization": f"Bearer {API_TOKEN}"}
-    params = {"query": FILTER}
+    params = {"query": filter_query}
 
     tasks = []
     while True:
@@ -49,7 +56,7 @@ def get_tasks() -> dict[str, list]:
         next_cursor = data.get('next_cursor')
         if not next_cursor:
             break
-        params = {"query": FILTER, "cursor": next_cursor}
+        params = {"query": filter_query, "cursor": next_cursor}
 
     # Build subtask index from ALL tasks in the account
     all_tasks = _get_all_tasks()

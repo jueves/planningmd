@@ -22,6 +22,9 @@ def generate(
     columns: Literal["auto", "1", "2"] = Query(
         "2", description="Column layout: 'auto' (two columns only if content exceeds one page), '1' or '2'"
     ),
+    extended_mode: bool = Query(
+        False, description="Append an extra section (TODOIST_TITLE2 heading + tasks matching TODOIST_FILTER2)"
+    ),
     qr: bool = Query(
         False, alias="QR",
         description="Add a QR code linking to a Todoist search for tasks created after the document generation"
@@ -32,7 +35,7 @@ def generate(
 ):
     _check_token(access_token)
 
-    generate_planning(columns=columns, qr=qr, qr_target=qr_target)
+    generate_planning(columns=columns, extended_mode=extended_mode, qr=qr, qr_target=qr_target)
 
     return {"status": "ok"}
 
@@ -43,6 +46,9 @@ def print_planning(
     columns: Literal["auto", "1", "2"] = Query(
         "2", description="Column layout: 'auto' (two columns only if content exceeds one page), '1' or '2'"
     ),
+    extended_mode: bool = Query(
+        False, description="Append an extra section (TODOIST_TITLE2 heading + tasks matching TODOIST_FILTER2)"
+    ),
     qr: bool = Query(
         False, alias="QR",
         description="Add a QR code linking to a Todoist search for tasks created after the document generation"
@@ -53,7 +59,7 @@ def print_planning(
 ):
     _check_token(access_token)
 
-    path = generate_planning(columns=columns, qr=qr, qr_target=qr_target)
+    path = generate_planning(columns=columns, extended_mode=extended_mode, qr=qr, qr_target=qr_target)
 
     try:
         print_pdf(path)
