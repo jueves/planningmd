@@ -157,9 +157,8 @@ curl "http://localhost:8000/generate?access_token=your-secret-access-token&exten
 ```
 
 Both endpoints also accept an optional `QR` parameter. With `QR=true`, a QR
-code is floated at the top right of the content (with the text flowing around
-it) linking to a Todoist search for all tasks created after the document was
-generated:
+code is placed in the top-right corner of the document linking to a Todoist
+search for all tasks created after the document was generated:
 
 ```bash
 curl "http://localhost:8000/generate?access_token=your-secret-access-token&QR=true"

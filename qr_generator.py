@@ -15,7 +15,7 @@ def build_created_after_url(moment: datetime, target: str = "app") -> str:
     """
     if target not in ("app", "web"):
         raise ValueError(f"Invalid QR target: {target!r} (expected 'app' or 'web')")
-    query = quote(f"created after: {moment.strftime('%m/%d/%Y %H:%M')}", safe="")
+    query = quote(f"created after: {moment.strftime('%d/%m/%Y %H:%M')}", safe="")
     if target == "app":
         return f"todoist://search?query={query}"
     return f"https://app.todoist.com/app/search/{query}"
