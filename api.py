@@ -22,10 +22,14 @@ def generate(
     columns: Literal["auto", "1", "2"] = Query(
         "2", description="Column layout: 'auto' (two columns only if content exceeds one page), '1' or '2'"
     ),
+    qr: bool = Query(
+        False, alias="QR",
+        description="Add a QR code linking to a Todoist search for tasks created after the document generation"
+    ),
 ):
     _check_token(access_token)
 
-    generate_planning(columns=columns)
+    generate_planning(columns=columns, qr=qr)
 
     return {"status": "ok"}
 
@@ -36,10 +40,14 @@ def print_planning(
     columns: Literal["auto", "1", "2"] = Query(
         "2", description="Column layout: 'auto' (two columns only if content exceeds one page), '1' or '2'"
     ),
+    qr: bool = Query(
+        False, alias="QR",
+        description="Add a QR code linking to a Todoist search for tasks created after the document generation"
+    ),
 ):
     _check_token(access_token)
 
-    path = generate_planning(columns=columns)
+    path = generate_planning(columns=columns, qr=qr)
 
     try:
         print_pdf(path)

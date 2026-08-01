@@ -44,6 +44,15 @@ ul.subtasks li {
     color: #555;
     margin-left: 1.2em;
 }
+.qr-corner {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+.qr-corner svg {
+    width: 1.8cm;
+    height: 1.8cm;
+}
 blockquote.daily-quote {
     margin: 0 0 0.5cm 0;
     padding: 0.2cm 0.4cm 0.2cm 0.5cm;

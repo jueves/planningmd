@@ -143,6 +143,14 @@ Both endpoints accept an optional `columns` parameter to control the layout:
 curl "http://localhost:8000/generate?access_token=your-secret-access-token&columns=auto"
 ```
 
+Both endpoints also accept an optional `QR` parameter. With `QR=true`, a QR
+code is placed in the top-right corner of the document linking to a Todoist
+search for all tasks created after the document was generated:
+
+```bash
+curl "http://localhost:8000/generate?access_token=your-secret-access-token&QR=true"
+```
+
 ## Structure
 
 | File | Description |
@@ -154,6 +162,7 @@ curl "http://localhost:8000/generate?access_token=your-secret-access-token&colum
 | `markdown_generator.py` | Generates Markdown content |
 | `html_generator.py` | Converts to styled HTML |
 | `pdf_generator.py` | Exports HTML to PDF (WeasyPrint) |
+| `qr_generator.py` | Builds the Todoist search URL and its QR code (SVG) |
 | `printer.py` | Sends the PDF to a CUPS print queue (`lp`) |
 | `styles.css` | PDF styles |
 

@@ -6,3 +6,4 @@ recurring-ical-events
 pytz
 fastapi
 uvicorn
+qrcode

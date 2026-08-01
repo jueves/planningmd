@@ -1,15 +1,18 @@
 import locale
 from collections import defaultdict
+from datetime import datetime
 from todoist_client import get_tasks
 from caldav_client import get_events
 from markdown_generator import generate_markdown
 from html_generator import generate_html
 from pdf_generator import generate_pdf
+from qr_generator import build_created_after_url, generate_qr_svg
 from quotes import get_random_quote
 
 
-def generate_planning(columns: str = "2"):
+def generate_planning(columns: str = "2", qr: bool = False):
     locale.setlocale(locale.LC_TIME, '')
+    generation_time = datetime.now()
     groups, dates_order, subtasks_by_parent = get_tasks()
 
     events = get_events()
@@ -29,7 +32,8 @@ def generate_planning(columns: str = "2"):
     print(content)
     quote = get_random_quote()
     html = generate_html(groups, dates_order, subtasks_by_parent, dict(events_by_date), quote=quote)
-    path = generate_pdf(html, columns=columns)
+    qr_svg = generate_qr_svg(build_created_after_url(generation_time)) if qr else None
+    path = generate_pdf(html, columns=columns, qr_svg=qr_svg)
     print(f"\nPDF generated: {path}")
     return path
 
