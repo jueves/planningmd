@@ -8,6 +8,15 @@ body {
     column-count: 2;
     column-gap: 0.6cm;
 }
+h1.section-title {
+    color: #2c3e50;
+    border-bottom: 2px solid #2c3e50;
+    padding-bottom: 2px;
+    margin-top: 0.8em;
+    margin-bottom: 0.2em;
+    font-size: 13pt;
+    column-span: all;
+}
 h2 {
     color: #2c3e50;
     border-bottom: 1px solid #ccc;

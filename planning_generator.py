@@ -1,14 +1,15 @@
 import locale
+import os
 from collections import defaultdict
 from todoist_client import get_tasks
 from caldav_client import get_events
 from markdown_generator import generate_markdown
-from html_generator import generate_html
+from html_generator import generate_html, generate_section_html
 from pdf_generator import generate_pdf
 from quotes import get_random_quote
 
 
-def generate_planning(columns: str = "2"):
+def generate_planning(columns: str = "2", extended_mode: bool = False):
     locale.setlocale(locale.LC_TIME, '')
     groups, dates_order, subtasks_by_parent = get_tasks()
 
@@ -29,6 +30,13 @@ def generate_planning(columns: str = "2"):
     print(content)
     quote = get_random_quote()
     html = generate_html(groups, dates_order, subtasks_by_parent, dict(events_by_date), quote=quote)
+
+    if extended_mode:
+        title2 = os.getenv("TODOIST_TITLE2", "")
+        filter2 = os.getenv("TODOIST_FILTER2", "")
+        groups2, dates_order2, subtasks_by_parent2 = get_tasks(filter_query=filter2)
+        html += "\n" + generate_section_html(title2, groups2, dates_order2, subtasks_by_parent2)
+
     path = generate_pdf(html, columns=columns)
     print(f"\nPDF generated: {path}")
     return path

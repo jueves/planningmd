@@ -22,10 +22,13 @@ def generate(
     columns: Literal["auto", "1", "2"] = Query(
         "2", description="Column layout: 'auto' (two columns only if content exceeds one page), '1' or '2'"
     ),
+    extended_mode: bool = Query(
+        False, description="Append an extra section (TODOIST_TITLE2 heading + tasks matching TODOIST_FILTER2)"
+    ),
 ):
     _check_token(access_token)
 
-    generate_planning(columns=columns)
+    generate_planning(columns=columns, extended_mode=extended_mode)
 
     return {"status": "ok"}
 
@@ -36,10 +39,13 @@ def print_planning(
     columns: Literal["auto", "1", "2"] = Query(
         "2", description="Column layout: 'auto' (two columns only if content exceeds one page), '1' or '2'"
     ),
+    extended_mode: bool = Query(
+        False, description="Append an extra section (TODOIST_TITLE2 heading + tasks matching TODOIST_FILTER2)"
+    ),
 ):
     _check_token(access_token)
 
-    path = generate_planning(columns=columns)
+    path = generate_planning(columns=columns, extended_mode=extended_mode)
 
     try:
         print_pdf(path)
