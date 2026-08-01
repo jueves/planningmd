@@ -54,6 +54,52 @@ def _quote_html(quote: str) -> str:
     return f'<blockquote class="daily-quote"><p>{_escape_html(quote)}</p></blockquote>'
 
 
+def _date_block_html(date_str: str, tasks: list, subtasks_by_parent: dict, events: list) -> str:
+    """Generates the HTML block for one date: heading, events and tasks."""
+    heading = date_to_heading(date_str) if date_str else "No date"
+    parts = [f'<h2>{_escape_html(heading)}</h2>', '<ul>']
+
+    # Render calendar events before tasks
+    for event in events:
+        title = _escape_html(event.get('title', ''))
+        calendar = _escape_html(event.get('calendar', ''))
+        start_time = event.get('start_time')
+        end_time = event.get('end_time')
+        if start_time and end_time:
+            time_html = f' <span class="event-meta">De {start_time} a {end_time}</span>'
+        else:
+            time_html = ''
+        parts.append(f'<li class="event">🗓️ {title}{time_html}</li>')
+
+    parent_tasks = [t for t in tasks if not t.get('parent_id')]
+    child_tasks = [t for t in tasks if t.get('parent_id')]
+    all_tasks = parent_tasks + child_tasks
+    for task in sorted(all_tasks, key=lambda t: t.get('priority', 1), reverse=True):
+        priority = task.get('priority', 1)
+        emoji = PRIORITY_EMOJIS.get(priority, '')
+        content = _escape_html(task.get('content', ''))
+        raw_description = task.get('description', '') or ''
+        clean_description = clean_markdown(raw_description)[:100]
+        clean_description = _escape_html(clean_description)
+
+        title_html = f'{emoji} {content}'.strip()
+        extra = ''
+        if clean_description:
+            extra += f'<br><span class="desc">{clean_description}</span>'
+
+        subtasks = subtasks_by_parent.get(task.get('id'), [])
+        if subtasks:
+            items = ''.join(
+                f'<li>{_escape_html(s.get("content", ""))}</li>'
+                for s in subtasks
+            )
+            extra += f'<ul class="subtasks">{items}</ul>'
+
+        parts.append(f'<li>{title_html}{extra}</li>')
+    parts.append('</ul>')
+    return "\n".join(parts)
+
+
 def generate_html(groups: dict, dates_order: list, subtasks_by_parent: dict = None, events_by_date: dict = None, quote: str = None) -> str:
     """Generates HTML with task title, summarized description and subtasks below.
 
@@ -76,46 +122,26 @@ def generate_html(groups: dict, dates_order: list, subtasks_by_parent: dict = No
     if quote:
         blocks.append(_quote_html(quote))
     for date_str in dates_order:
-        heading = date_to_heading(date_str) if date_str else "No date"
-        parts = [f'<h2>{_escape_html(heading)}</h2>', '<ul>']
+        blocks.append(_date_block_html(date_str, groups[date_str], subtasks_by_parent, events_by_date.get(date_str, [])))
+    return "\n".join(blocks)
 
-        # Render calendar events before tasks
-        for event in events_by_date.get(date_str, []):
-            title = _escape_html(event.get('title', ''))
-            calendar = _escape_html(event.get('calendar', ''))
-            start_time = event.get('start_time')
-            end_time = event.get('end_time')
-            if start_time and end_time:
-                time_html = f' <span class="event-meta">De {start_time} a {end_time}</span>'
-            else:
-                time_html = ''
-            parts.append(f'<li class="event">🗓️ {title}{time_html}</li>')
 
-        parent_tasks = [t for t in groups[date_str] if not t.get('parent_id')]
-        child_tasks = [t for t in groups[date_str] if t.get('parent_id')]
-        all_tasks = parent_tasks + child_tasks
-        for task in sorted(all_tasks, key=lambda t: t.get('priority', 1), reverse=True):
-            priority = task.get('priority', 1)
-            emoji = PRIORITY_EMOJIS.get(priority, '')
-            content = _escape_html(task.get('content', ''))
-            raw_description = task.get('description', '') or ''
-            clean_description = clean_markdown(raw_description)[:100]
-            clean_description = _escape_html(clean_description)
+def generate_section_html(title: str, groups: dict, dates_order: list, subtasks_by_parent: dict = None) -> str:
+    """Generates an extra section: a title heading followed by tasks grouped by date.
 
-            title_html = f'{emoji} {content}'.strip()
-            extra = ''
-            if clean_description:
-                extra += f'<br><span class="desc">{clean_description}</span>'
+    Args:
+        title: section title shown as a heading before the tasks
+        groups: dict {date_str: [tasks]}
+        dates_order: list of dates in order of appearance
+        subtasks_by_parent: dict {parent_id: [subtasks]} with ALL subtasks
 
-            subtasks = subtasks_by_parent.get(task.get('id'), [])
-            if subtasks:
-                items = ''.join(
-                    f'<li>{_escape_html(s.get("content", ""))}</li>'
-                    for s in subtasks
-                )
-                extra += f'<ul class="subtasks">{items}</ul>'
+    Returns:
+        String with the generated HTML (without DOCTYPE/html wrapper).
+    """
+    if subtasks_by_parent is None:
+        subtasks_by_parent = {}
 
-            parts.append(f'<li>{title_html}{extra}</li>')
-        parts.append('</ul>')
-        blocks.append("\n".join(parts))
+    blocks = [f'<h1 class="section-title">{_escape_html(title)}</h1>']
+    for date_str in dates_order:
+        blocks.append(_date_block_html(date_str, groups[date_str], subtasks_by_parent, []))
     return "\n".join(blocks)
