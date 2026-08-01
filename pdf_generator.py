@@ -3,6 +3,7 @@ from weasyprint import HTML, CSS
 from datetime import datetime
 
 _CSS_PATH = Path(__file__).parent / "styles.css"
+_OUTPUT_DIR = Path(__file__).parent / "pdfs"
 
 
 def _complete_html(html_content: str, two_columns: bool) -> str:
@@ -26,15 +27,17 @@ def generate_pdf(html_content: str, output_path: str = None, two_columns: bool =
     Args:
         html_content: HTML fragment of the body to convert.
         output_path: Path of the output PDF file. If not provided,
-                     a name is generated with the current date/time.
+                     a name with the current date/time is generated
+                     inside the pdfs/ directory.
         two_columns: If True, uses the two-column layout directly.
 
     Returns:
         Path of the generated PDF file.
     """
     if output_path is None:
+        _OUTPUT_DIR.mkdir(exist_ok=True)
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        output_path = f"planning_{timestamp}.pdf"
+        output_path = str(_OUTPUT_DIR / f"planning_{timestamp}.pdf")
 
     ts = datetime.now().strftime('%d/%m/%Y  %H:%M')
     footer_css = CSS(string=f"""
