@@ -2,7 +2,8 @@ FROM python:3.14-trixie
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-    libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-subset0 libjpeg-dev libopenjp2-7-dev libffi-dev cups-client
+    libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-subset0 libjpeg-dev libopenjp2-7-dev libffi-dev cups-client \
+    fonts-noto-color-emoji fonts-liberation
 
 WORKDIR /planningmd
 
