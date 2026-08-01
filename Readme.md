@@ -52,9 +52,49 @@ networks:
     external: true
 ```
 
-Then set `CUPS_SERVER=cups` (the CUPS container's service name) in `.env`, and
-make sure the CUPS `cupsd.conf` listens on all interfaces (`Port 631`) and
-allows the Docker subnet (e.g. `Allow 172.16.0.0/12` inside `<Location />`).
+Then set `CUPS_SERVER=cups` (the CUPS container's service name) in `.env`.
+
+### CUPS server configuration
+
+The CUPS server needs two changes in its `cupsd.conf` to accept jobs from
+this container:
+
+**1. Allow the shared network's IP range.** Find out the subnet of the
+`printing` network:
+
+```bash
+docker network inspect printing | grep Subnet
+```
+
+and allow it inside `<Location />` (example for subnet `172.80.20.0/24`):
+
+```
+<Location />
+  Order allow,deny
+  Allow @LOCAL
+  Allow 172.80.20.0/24
+</Location>
+```
+
+**2. Add `ServerAlias *`.** CUPS validates the `Host` header of incoming
+requests and rejects any hostname it doesn't recognize as its own (it answers
+`Bad Request`). Since the API reaches the server as `cups` (the container
+name), CUPS must be told to accept it:
+
+```
+ServerAlias *
+```
+
+Also make sure CUPS listens on all interfaces (`Port 631`, the usual default
+in dockerized CUPS). Restart the CUPS container after editing `cupsd.conf`.
+
+To verify connectivity from inside the API container:
+
+```bash
+docker compose exec api lpstat -h cups -p
+```
+
+It should list the print queue defined in `PRINTER_NAME`.
 
 ## Usage
 
