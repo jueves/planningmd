@@ -26,7 +26,75 @@ ICAL_USERNAME=user@example.com
 ICAL_PASSWORD=your_password_here
 ICAL_CALENDAR_NAMES=Personal,Work   # Comma-separated list; leave empty to include all calendars
 ICAL_DAYS_AHEAD=7                   # Number of days ahead to fetch events (default: 7)
+
+# Network printer via CUPS (optional — required only for the /print endpoint)
+CUPS_SERVER=192.168.1.10           # CUPS server host (or host:port; port defaults to 631). Empty = local CUPS
+PRINTER_NAME=my-printer            # Print queue name on that CUPS server
 ```
+
+If the CUPS server runs in another Docker container on the same host, connect
+both containers through a shared network instead of going through the host:
+
+```bash
+docker network create printing
+```
+
+The `docker-compose.yml` of this project already joins the external `printing`
+network. Attach the CUPS service to it too (in the CUPS project's compose file):
+
+```yaml
+services:
+  cups:
+    # ...
+    networks: [default, printing]
+networks:
+  printing:
+    external: true
+```
+
+Then set `CUPS_SERVER=cups` (the CUPS container's service name) in `.env`.
+
+### CUPS server configuration
+
+The CUPS server needs two changes in its `cupsd.conf` to accept jobs from
+this container:
+
+**1. Allow the shared network's IP range.** Find out the subnet of the
+`printing` network:
+
+```bash
+docker network inspect printing | grep Subnet
+```
+
+and allow it inside `<Location />` (example for subnet `172.80.20.0/24`):
+
+```
+<Location />
+  Order allow,deny
+  Allow @LOCAL
+  Allow 172.80.20.0/24
+</Location>
+```
+
+**2. Add `ServerAlias *`.** CUPS validates the `Host` header of incoming
+requests and rejects any hostname it doesn't recognize as its own (it answers
+`Bad Request`). Since the API reaches the server as `cups` (the container
+name), CUPS must be told to accept it:
+
+```
+ServerAlias *
+```
+
+Also make sure CUPS listens on all interfaces (`Port 631`, the usual default
+in dockerized CUPS). Restart the CUPS container after editing `cupsd.conf`.
+
+To verify connectivity from inside the API container:
+
+```bash
+docker compose exec api lpstat -h cups -p
+```
+
+It should list the print queue defined in `PRINTER_NAME`.
 
 ## Usage
 
@@ -52,6 +120,16 @@ curl "http://localhost:8000/generate?access_token=your-secret-access-token"
 
 Returns `{"status": "ok"}` and generates the PDF locally.
 
+To generate **and print** the PDF on the configured network printer:
+
+```bash
+curl "http://localhost:8000/print?access_token=your-secret-access-token"
+```
+
+Returns `{"status": "ok", "printed": "planning_YYYYMMDD_HHMMSS.pdf"}`. The
+PDF is sent to the print queue `PRINTER_NAME` on the CUPS server `CUPS_SERVER`
+(IPP, port 631) using `lp`, so CUPS handles drivers and format conversion.
+
 ## Structure
 
 | File | Description |
@@ -63,6 +141,7 @@ Returns `{"status": "ok"}` and generates the PDF locally.
 | `markdown_generator.py` | Generates Markdown content |
 | `html_generator.py` | Converts to styled HTML |
 | `pdf_generator.py` | Exports HTML to PDF (WeasyPrint) |
+| `printer.py` | Sends the PDF to a CUPS print queue (`lp`) |
 | `styles.css` | PDF styles |
 
 ## Working directly with todoist_client.py

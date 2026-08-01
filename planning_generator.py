@@ -31,6 +31,7 @@ def generate_planning():
     html = generate_html(groups, dates_order, subtasks_by_parent, dict(events_by_date), quote=quote)
     path = generate_pdf(html)
     print(f"\nPDF generated: {path}")
+    return path
 
 
 if __name__ == "__main__":
