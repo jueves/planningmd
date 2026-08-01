@@ -53,11 +53,11 @@ ul.subtasks li {
     color: #555;
     margin-left: 1.2em;
 }
-.qr-header {
-    text-align: right;
-    margin-bottom: 0.15cm;
+.qr-float {
+    float: right;
+    margin: 0 0 0.1cm 0.15cm;
 }
-.qr-header svg {
+.qr-float svg {
     width: 1.8cm;
     height: 1.8cm;
 }

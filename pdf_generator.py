@@ -7,9 +7,9 @@ _OUTPUT_DIR = Path(__file__).parent / "pdfs"
 
 
 def _complete_html(html_content: str, two_columns: bool, qr_svg: str = None) -> str:
-    body = f'<div class="columnas">{html_content}</div>' if two_columns else html_content
     if qr_svg:
-        body = f'<div class="qr-header">{qr_svg}</div>{body}'
+        html_content = f'<div class="qr-float">{qr_svg}</div>{html_content}'
+    body = f'<div class="columnas">{html_content}</div>' if two_columns else html_content
     return f"""<!DOCTYPE html>
 <html>
 <head>
@@ -31,8 +31,8 @@ def generate_pdf(html_content: str, output_path: str = None, columns: str = "2",
                  "1" forces a single column, and "auto" renders a single
                  column first and re-renders with two columns if the
                  result takes more than one page.
-        qr_svg: Optional SVG string with a QR code to place in the
-                top-right corner of the document.
+        qr_svg: Optional SVG string with a QR code floated at the top
+                right of the content, with the text flowing around it.
 
     Returns:
         Path of the generated PDF file.
