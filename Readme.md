@@ -27,9 +27,9 @@ ICAL_PASSWORD=your_password_here
 ICAL_CALENDAR_NAMES=Personal,Work   # Comma-separated list; leave empty to include all calendars
 ICAL_DAYS_AHEAD=7                   # Number of days ahead to fetch events (default: 7)
 
-# Network printer (optional — required only for the /print endpoint)
-PRINTER_HOST=192.168.1.50          # IP/hostname of the network printer
-PRINTER_PORT=9100                  # Raw printing port (default: 9100)
+# Network printer via CUPS (optional — required only for the /print endpoint)
+CUPS_SERVER=192.168.1.10           # CUPS server host (or host:port; port defaults to 631). Empty = local CUPS
+PRINTER_NAME=my-printer            # Print queue name on that CUPS server
 ```
 
 ## Usage
@@ -63,8 +63,8 @@ curl "http://localhost:8000/print?access_token=your-secret-access-token"
 ```
 
 Returns `{"status": "ok", "printed": "planning_YYYYMMDD_HHMMSS.pdf"}`. The
-printer is defined by `PRINTER_HOST` in the `.env` file (see above). The PDF
-is sent directly to the printer over the raw printing port (9100).
+PDF is sent to the print queue `PRINTER_NAME` on the CUPS server `CUPS_SERVER`
+(IPP, port 631) using `lp`, so CUPS handles drivers and format conversion.
 
 ## Structure
 
@@ -77,7 +77,7 @@ is sent directly to the printer over the raw printing port (9100).
 | `markdown_generator.py` | Generates Markdown content |
 | `html_generator.py` | Converts to styled HTML |
 | `pdf_generator.py` | Exports HTML to PDF (WeasyPrint) |
-| `printer.py` | Sends the PDF to a network printer (raw port 9100) |
+| `printer.py` | Sends the PDF to a CUPS print queue (`lp`) |
 | `styles.css` | PDF styles |
 
 ## Working directly with todoist_client.py
