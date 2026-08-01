@@ -1,4 +1,5 @@
 import os
+from typing import Literal
 
 from fastapi import FastAPI, HTTPException, Query
 
@@ -16,19 +17,29 @@ def _check_token(access_token: str) -> None:
 
 
 @app.get("/generate")
-def generate(access_token: str = Query(..., description="API access token")):
+def generate(
+    access_token: str = Query(..., description="API access token"),
+    columns: Literal["auto", "1", "2"] = Query(
+        "2", description="Column layout: 'auto' (two columns only if content exceeds one page), '1' or '2'"
+    ),
+):
     _check_token(access_token)
 
-    generate_planning()
+    generate_planning(columns=columns)
 
     return {"status": "ok"}
 
 
 @app.get("/print")
-def print_planning(access_token: str = Query(..., description="API access token")):
+def print_planning(
+    access_token: str = Query(..., description="API access token"),
+    columns: Literal["auto", "1", "2"] = Query(
+        "2", description="Column layout: 'auto' (two columns only if content exceeds one page), '1' or '2'"
+    ),
+):
     _check_token(access_token)
 
-    path = generate_planning()
+    path = generate_planning(columns=columns)
 
     try:
         print_pdf(path)

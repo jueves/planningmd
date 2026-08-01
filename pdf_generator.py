@@ -17,23 +17,25 @@ def _complete_html(html_content: str, two_columns: bool) -> str:
 </html>"""
 
 
-def generate_pdf(html_content: str, output_path: str = None, two_columns: bool = False) -> str:
+def generate_pdf(html_content: str, output_path: str = None, columns: str = "2") -> str:
     """Generates a PDF from HTML content.
-
-    If two_columns is False (default), renders first without columns and
-    checks the number of pages. If the result takes more than one page,
-    automatically re-renders with two columns.
 
     Args:
         html_content: HTML fragment of the body to convert.
         output_path: Path of the output PDF file. If not provided,
                      a name with the current date/time is generated
                      inside the pdfs/ directory.
-        two_columns: If True, uses the two-column layout directly.
+        columns: Layout mode. "2" (default) forces the two-column layout,
+                 "1" forces a single column, and "auto" renders a single
+                 column first and re-renders with two columns if the
+                 result takes more than one page.
 
     Returns:
         Path of the generated PDF file.
     """
+    if columns not in ("auto", "1", "2"):
+        raise ValueError(f"Invalid columns mode: {columns!r} (expected 'auto', '1' or '2')")
+
     if output_path is None:
         _OUTPUT_DIR.mkdir(exist_ok=True)
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -52,7 +54,7 @@ def generate_pdf(html_content: str, output_path: str = None, two_columns: bool =
     """)
     styles = [CSS(filename=str(_CSS_PATH)), footer_css]
 
-    if two_columns:
+    if columns == "2":
         HTML(string=_complete_html(html_content, two_columns=True)).write_pdf(
             output_path, stylesheets=styles
         )
@@ -61,7 +63,7 @@ def generate_pdf(html_content: str, output_path: str = None, two_columns: bool =
     document = HTML(string=_complete_html(html_content, two_columns=False)).render(
         stylesheets=styles
     )
-    if len(document.pages) > 1:
+    if columns == "auto" and len(document.pages) > 1:
         print(f"PDF has {len(document.pages)} pages, regenerating with two columns...")
         HTML(string=_complete_html(html_content, two_columns=True)).write_pdf(
             output_path, stylesheets=styles
